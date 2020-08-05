@@ -1,0 +1,5 @@
+<map id="inheritance283271efa1" name="inheritance283271efa1">
+<area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.DSN.WVSRbackend.html#MonitorControl.BackEnds.DSN.WVSRbackend" target="_top" title="WVSRbackend" alt="" coords="252,5,368,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+</map>

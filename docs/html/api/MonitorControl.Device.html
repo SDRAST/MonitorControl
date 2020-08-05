@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DeviceReadThread" href="MonitorControl.DeviceReadThread.html" />
+    <link rel="prev" title="ComplexSignal" href="MonitorControl.ComplexSignal.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.DeviceReadThread.html" title="DeviceReadThread"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.ComplexSignal.html" title="ComplexSignal"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Device</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="device">
+<h1>Device<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.Device">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.</code><code class="sig-name descname">Device</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">hardware</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Superclass for anything that receives, processes and outputs a signal.</p>
+<p>Signals are handled by Port instances. Inputs and outputs are channels.
+There may be internal channels connecting inputs and outputs.</p>
+<dl class="simple">
+<dt>Public Attributes::</dt><dd><p>name    - pols = unique(pols) identifier str
+active  - bool is True if device is available
+data    - dict for any kind of data for the device
+inputs  - dict of input Port instances
+outputs - dict of output Port instances</p>
+</dd>
+</dl>
+<p><em>Port Naming Convention</em></p>
+<p>The input and output names must be sortable so that outputs correspond to the
+appropriate input.  For example, if the inputs are X1 and X2 and the outputs
+are A, B, C, D, then A, B must be associated with X1 and C, D to X2.  Further
+A is similar to C and B is similar to D.  (This is because the order in which
+dict key,value pairs are specified is not preserved.)</p>
+<p>The dict ‘inputs’ should have all the input port names, even ones not used.
+Just assign those the value None.</p>
+<p>‘output_names’ should be a list of lists, where the inner lists are the
+output names of each of the channels.</p>
+<p><em>FITS Header Data</em></p>
+<p>Wherever possible, a FITS keyword will adhere to the standard usage.  Local
+keywords, not used in the wider community, are in lowercase.</p>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Device.base" title="MonitorControl.Device.base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code></a>()</p></td>
+<td><p>String representing the class instance type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Device.has_key" title="MonitorControl.Device.has_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_key</span></code></a>(key)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Device.keys" title="MonitorControl.Device.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Device.update_signals" title="MonitorControl.Device.update_signals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_signals</span></code></a>()</p></td>
+<td><p>Updates the signals passing out of a device.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.Device.base">
+<code class="sig-name descname">base</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Device.base" title="Permalink to this definition">¶</a></dt>
+<dd><p>String representing the class instance type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Device.has_key">
+<code class="sig-name descname">has_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Device.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Device.keys">
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Device.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Device.update_signals">
+<code class="sig-name descname">update_signals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Device.update_signals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the signals passing out of a device.</p>
+<p>If a device updates it signals, the down-stream devices must update their
+signals also.  Since the destinations are Port objects, the updating must
+be done by the parent of the Port.</p>
+<p>Note that this promulgates updates via the top-level Device outputs.
+It does not update the child Device objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.ComplexSignal.html"
+                        title="previous chapter">ComplexSignal</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.DeviceReadThread.html"
+                        title="next chapter">DeviceReadThread</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.Device.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.DeviceReadThread.html" title="DeviceReadThread"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.ComplexSignal.html" title="ComplexSignal"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Device</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

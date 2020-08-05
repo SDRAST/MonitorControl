@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Spectrum" href="MonitorControl.Spectrum.html" />
+    <link rel="prev" title="Port" href="MonitorControl.Port.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Spectrum.html" title="Spectrum"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Port.html" title="Port"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Signal</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="signal">
+<h1>Signal<a class="headerlink" href="#signal" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.Signal">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.</code><code class="sig-name descname">Signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent_signal</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">beam</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pol</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">IF_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for type of signal passing through a Port object.</p>
+<p>A signal is derived from nothing (or the ether, if you like) or from another
+signal. The parent signal is more generic.  In the most general case it has
+two complex polarized components as received by a feed.</p>
+<p>Core signal property is ‘beam’. After the two polarizations have been
+separated, the signals have a ‘pol’ property. After being down-converted
+(mixed) it has an ‘IF’ property.</p>
+<p>Signals carry some FITS data, namely ‘BEAM’, ‘fechl-pol’, ‘IF’ and ‘ifname’.</p>
+<dl class="simple">
+<dt>Public Attributes::</dt><dd><p>name -
+data -</p>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Signal.copy" title="MonitorControl.Signal.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>(signal)</p></td>
+<td><p>Copy the properties of the specified signal</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Signal.has_key" title="MonitorControl.Signal.has_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_key</span></code></a>(key)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Signal.keys" title="MonitorControl.Signal.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.Signal.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signal</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Signal.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy the properties of the specified signal</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Signal.has_key">
+<code class="sig-name descname">has_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Signal.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Signal.keys">
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Signal.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.Port.html"
+                        title="previous chapter">Port</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.Spectrum.html"
+                        title="next chapter">Spectrum</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.Signal.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Spectrum.html" title="Spectrum"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Port.html" title="Port"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Signal</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

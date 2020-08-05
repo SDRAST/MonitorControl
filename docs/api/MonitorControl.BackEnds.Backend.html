@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Processor" href="MonitorControl.BackEnds.Processor.html" />
+    <link rel="prev" title="get_smoothed_bandshape" href="MonitorControl.BackEnds.get_smoothed_bandshape.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.Processor.html" title="Processor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.get_smoothed_bandshape.html" title="get_smoothed_bandshape"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Backend</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="backend">
+<h1>Backend<a class="headerlink" href="#backend" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.BackEnds.Backend">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.</code><code class="sig-name descname">Backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">processors</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.Device.html#MonitorControl.Device" title="MonitorControl.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.Device</span></code></a></p>
+<p>Defines the Backend class, some assembly of DSP hardware.</p>
+<p>Ultimately the signal is processed and recorded.  Although only the
+properties of the recorded signal are required for data analysis, it is
+good documentation practice to identify the device which records the signal
+so the FITS keyword BACKEND is strongly recommended.</p>
+<p>This is an base (or ancestor) class. A Backend may use multiple processors
+represented by the private class DSProc.  A ROACH is one realization of a
+DSProc. All DSProc instances must have the same firmware to implement
+parallel signal paths.</p>
+<dl class="simple">
+<dt>Public attributes, in addition to those defined for the Device superclass::</dt><dd><ul class="simple">
+<li><p>DSProc - private class for hardware</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.Backend.polcodes" title="MonitorControl.BackEnds.Backend.polcodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">polcodes</span></code></a>()</p></td>
+<td><p>Returns the parameters defining the STOKES axis of SDFITS table from signals</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.Backend.read" title="MonitorControl.BackEnds.Backend.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>()</p></td>
+<td><p>Read data into memory.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.Backend.start" title="MonitorControl.BackEnds.Backend.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>(integration_time)</p></td>
+<td><p>Start taking data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.Backend.stop" title="MonitorControl.BackEnds.Backend.stop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code></a>([save])</p></td>
+<td><p>Stop taking data.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.Backend.polcodes">
+<code class="sig-name descname">polcodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.Backend.polcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the parameters defining the STOKES axis of SDFITS table from signals</p>
+<p>This returns the NRAO FITS codes for the polarizations of the signals
+entering a backend.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.Backend.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.Backend.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data into memory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.Backend.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">integration_time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.Backend.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start taking data.</p>
+<p>:param integration_time : stop after this many seconds; raise ‘done’ flag’
+:type  integration_time : float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.Backend.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.Backend.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop taking data.</p>
+<p>:param save : True to save data, False to discard.
+:type  save : Boolean</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.get_smoothed_bandshape.html"
+                        title="previous chapter">get_smoothed_bandshape</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.Processor.html"
+                        title="next chapter">Processor</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.BackEnds.Backend.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.Processor.html" title="Processor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.get_smoothed_bandshape.html" title="get_smoothed_bandshape"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Backend</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+<map id="inheritance9d3da4f4e6" name="inheritance9d3da4f4e6">
+<area shape="rect" id="node1" href="api/MonitorControl.Antenna.DSN.DSN_Antenna.html#MonitorControl.Antenna.DSN.DSN_Antenna" target="_top" title="A subclass of Telescope that can connect to a server that is currently" alt="" coords="447,128,557,153"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Antenna.Telescope.html#MonitorControl.Antenna.Telescope" target="_top" title="Defines the Telescope class." alt="" coords="283,79,370,104"/>
+<area shape="rect" id="node3" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="255,128,399,153"/>
+<area shape="rect" id="node4" title="Mixin class with methods for creating and writing to HDF5 files." alt="" coords="281,177,373,203"/>
+<area shape="rect" id="node5" title="Observer suclass class for DSN stations based on xephem Observer" alt="" coords="135,29,207,55"/>
+<area shape="rect" id="node6" title="A location on earth for which positions are to be computed." alt="" coords="5,29,87,55"/>
+<area shape="rect" id="node7" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="135,79,207,104"/>
+<area shape="rect" id="node8" title="A class that represents a thread of control." alt="" coords="135,128,207,153"/>
+</map>

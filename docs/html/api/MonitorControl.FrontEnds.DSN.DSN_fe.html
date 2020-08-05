@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSN_fe &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="DSN_Antenna" href="MonitorControl.Antenna.DSN.DSN_Antenna.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.DSN_Antenna.html" title="DSN_Antenna"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">DSN_fe</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dsn-fe">
+<h1>DSN_fe<a class="headerlink" href="#dsn-fe" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.FrontEnds.DSN.DSN_fe">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.FrontEnds.DSN.</code><code class="sig-name descname">DSN_fe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.DSN.DSN_fe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" title="MonitorControl.FrontEnds.FrontEnd"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.FrontEnds.FrontEnd</span></code></a></p>
+<p>Class for DSN front ends with no M&amp;C functions</p>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.DSN.DSN_fe.Tsys_vacuum" title="MonitorControl.FrontEnds.DSN.DSN_fe.Tsys_vacuum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tsys_vacuum</span></code></a>([beam, pol, mode, elevation])</p></td>
+<td><p>System temperature without an atmosphere</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.DSN.DSN_fe.get_frequencies" title="MonitorControl.FrontEnds.DSN.DSN_fe.get_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_frequencies</span></code></a>()</p></td>
+<td><p>The downlink bands allocated to Space Research (Space to Earth) are.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.DSN.DSN_fe.rx_noise_temp" title="MonitorControl.FrontEnds.DSN.DSN_fe.rx_noise_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rx_noise_temp</span></code></a>([pol, mode, elevation])</p></td>
+<td><p>Noise temperature measured at the feed</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.DSN.DSN_fe.Tsys_vacuum">
+<code class="sig-name descname">Tsys_vacuum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">beam</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pol</span><span class="o">=</span><span class="default_value">'R'</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'X'</span></em>, <em class="sig-param"><span class="n">elevation</span><span class="o">=</span><span class="default_value">90</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.DSN.DSN_fe.Tsys_vacuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>System temperature without an atmosphere</p>
+<p>This ignores attenuation through the atmosphere. Attenuation by the
+atmosphere is about 0.8% at S-band and between 0.8 and 1.3% at X-band.
+It also ignore ground pickup</p>
+<p>:param beam : beam number, only significant for K-band
+:type  beam : int</p>
+<p>:param pol : polarization, “R” or “L”
+:type  pol : str</p>
+<p>:param mode : “X” or “SX”, only significant for X-band
+:type  mode : str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.DSN.DSN_fe.get_frequencies">
+<code class="sig-name descname">get_frequencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.DSN.DSN_fe.get_frequencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>The downlink bands allocated to Space Research (Space to Earth) are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>              <span class="n">S</span>          <span class="n">X</span>           <span class="n">K</span>            <span class="n">Ka</span>
+<span class="n">near</span> <span class="n">Earth</span><span class="p">:</span> <span class="mi">2200</span><span class="o">-</span><span class="mi">2290</span>  <span class="mi">8450</span><span class="o">-</span><span class="mi">8500</span>  <span class="mi">25500</span><span class="o">-</span><span class="mi">27000</span>
+<span class="n">deep</span> <span class="n">space</span><span class="p">:</span> <span class="mi">2290</span><span class="o">-</span><span class="mi">2300</span>  <span class="mi">8400</span><span class="o">-</span><span class="mi">8450</span>               <span class="mi">31800</span><span class="o">-</span><span class="mi">32300</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="http://deepspace.jpl.nasa.gov/dsndocs/810-005/201/201B.pdf">http://deepspace.jpl.nasa.gov/dsndocs/810-005/201/201B.pdf</a></p>
+<p>The actual bandpasses are given in the code.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.DSN.DSN_fe.rx_noise_temp">
+<code class="sig-name descname">rx_noise_temp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pol</span><span class="o">=</span><span class="default_value">'R'</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'X'</span></em>, <em class="sig-param"><span class="n">elevation</span><span class="o">=</span><span class="default_value">90</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.DSN.DSN_fe.rx_noise_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Noise temperature measured at the feed</p>
+<p>From Appendix A of 810-005 module 101</p>
+<p>:param pol : either ‘R’ (DSN standard) or ‘L’
+:type  pol : int</p>
+<p>:param mode : either ‘X’ or ‘SX’ for dual (diplexer in)
+:type  mode : str</p>
+<p>:param elevation : angle in deg  from horizon to zenith
+:type  elevation : float</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.Antenna.DSN.DSN_Antenna.html"
+                        title="previous chapter">DSN_Antenna</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.FrontEnds.DSN.DSN_fe.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.DSN_Antenna.html" title="DSN_Antenna"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">DSN_fe</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

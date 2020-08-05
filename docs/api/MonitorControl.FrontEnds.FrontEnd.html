@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrontEnd &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DSN_Antenna" href="MonitorControl.Antenna.DSN.DSN_Antenna.html" />
+    <link rel="prev" title="Telescope" href="MonitorControl.Antenna.Telescope.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.DSN_Antenna.html" title="DSN_Antenna"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.Telescope.html" title="Telescope"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">FrontEnd</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frontend">
+<h1>FrontEnd<a class="headerlink" href="#frontend" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.FrontEnds.FrontEnd">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.FrontEnds.</code><code class="sig-name descname">FrontEnd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.FrontEnd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.Device.html#MonitorControl.Device" title="MonitorControl.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.Device</span></code></a></p>
+<p>Device which converts EM radiation to electrical signals.</p>
+<p>This is the superclass for all front end implementations</p>
+<p>Each RF band (L, S, X, Ku, K, Ka, Q) is handled by a separate front end.
+The bands are defined in signal_property[“band”] in the MonitorControl
+module.</p>
+<p>For multi-feed front ends, a channel is assigned to each feed. Each front
+end or front end channel may put out one or two orthogonal polarizations,
+L and R or X and Y or H and V .The polarizations are defined in
+signal_property[“pol_type”] in the MonitorControl module.</p>
+<p>The input channels handle Beam class signals, that is, a signal in which
+both polarizations are present. The output channels provide
+ComplexSignal class signals, that is, two fluctuating voltages whose
+frequency components are 90 deg apart (in quadrature phase).</p>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.FrontEnd.set_ND" title="MonitorControl.FrontEnds.FrontEnd.set_ND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_ND</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.FrontEnd.set_cal_signal" title="MonitorControl.FrontEnds.FrontEnd.set_cal_signal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cal_signal</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.FrontEnd.set_ND">
+<code class="sig-name descname">set_ND</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.FrontEnd.set_ND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.FrontEnd.set_cal_signal">
+<code class="sig-name descname">set_cal_signal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.FrontEnd.set_cal_signal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.Antenna.Telescope.html"
+                        title="previous chapter">Telescope</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.Antenna.DSN.DSN_Antenna.html"
+                        title="next chapter">DSN_Antenna</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.FrontEnds.FrontEnd.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.DSN_Antenna.html" title="DSN_Antenna"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.Telescope.html" title="Telescope"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">FrontEnd</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+<map id="inheritancee556d4fe3b" name="inheritancee556d4fe3b">
+<area shape="rect" id="node1" href="api/MonitorControl.Antenna.Antenna.html#MonitorControl.Antenna.Antenna" target="_top" title="A subclass of Telescope that can connect to a server that is currently" alt="" coords="389,55,465,80"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Antenna.Telescope.html#MonitorControl.Antenna.Telescope" target="_top" title="Defines the Telescope class." alt="" coords="255,55,341,80"/>
+<area shape="rect" id="node3" title="Observer suclass class for DSN stations based on xephem Observer" alt="" coords="135,29,207,55"/>
+<area shape="rect" id="node4" title="A location on earth for which positions are to be computed." alt="" coords="5,29,87,55"/>
+<area shape="rect" id="node5" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="135,79,207,104"/>
+</map>

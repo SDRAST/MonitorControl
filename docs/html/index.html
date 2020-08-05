@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Dish Radio Astronomy Software Tools &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ClassInstance" href="api/MonitorControl.ClassInstance.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api/MonitorControl.ClassInstance.html" title="ClassInstance"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Single Dish Radio Astronomy Software Tools</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="single-dish-radio-astronomy-software-tools">
+<h1>Single Dish Radio Astronomy Software Tools<a class="headerlink" href="#single-dish-radio-astronomy-software-tools" title="Permalink to this headline">¶</a></h1>
+<p>For an overview of SDRAST and the current status please visit <a class="reference external" href="https://sdrast.github.io/">https://sdrast.github.io/</a>.</p>
+</div>
+<div class="section" id="note">
+<h1>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h1>
+<p>These packages are in a very preliminary state and need lots of work.  The original code was very specific to the DSN context.  The conversion will proceed subsystem by susbsystem.</p>
+</div>
+<div class="section" id="base-class-modules">
+<h1>Base Class Modules<a class="headerlink" href="#base-class-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-MonitorControl">
+<span id="monitorcontrol-package"></span><h2>MonitorControl Package<a class="headerlink" href="#module-MonitorControl" title="Permalink to this headline">¶</a></h2>
+<p>Monitor and Control of DSN radio astronomy equipment</p>
+<p>In a very general sense, a configuration consists of Device sub-classes which
+operate on signals, and Ports at the Device inputs and outputs which transfer
+signals from one Device to another.  Configurations defined for various
+situations are in the Configurations sub-module.</p>
+<p>Devices may add to the properties of a signal.  This is a typical sequence.</p>
+<p>There are many ways a Device may characterize the data.  Most common is power,
+or something which is proportional to the average of the square of the voltage
+samples.  Cross-product averages may contain polarization information or fringe
+visibility. Because the output ports and signals must encode what kind of data
+they contain, a number of standard codes are defined for Device, Port and
+Signal objects which MUST be used in their names.</p>
+<p>Classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MonitorControlError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">)</span>
+<span class="n">MCPublisher</span><span class="p">(</span><span class="n">ZmqPublisher</span><span class="p">)</span>
+<span class="n">Signal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>                     <span class="o">-</span>
+<span class="n">Beam</span><span class="p">(</span><span class="n">Signal</span><span class="p">)</span>                       <span class="o">-</span> <span class="n">signal</span> <span class="k">with</span> <span class="n">both</span> <span class="n">polarizations</span> <span class="n">present</span>
+<span class="n">ComplexSignal</span><span class="p">(</span><span class="n">Signal</span><span class="p">)</span>              <span class="o">-</span> <span class="n">signal</span> <span class="k">with</span> <span class="n">both</span> <span class="n">I</span> <span class="ow">and</span> <span class="n">Q</span> <span class="n">components</span>
+<span class="n">IF</span><span class="p">(</span><span class="n">Signal</span><span class="p">)</span>                         <span class="o">-</span> <span class="n">signal</span> <span class="k">with</span> <span class="n">no</span> <span class="n">phase</span> <span class="n">information</span> <span class="p">(</span><span class="n">I</span> <span class="ow">or</span> <span class="n">Q</span><span class="p">)</span>
+<span class="n">Spectrum</span><span class="p">(</span><span class="n">Signal</span><span class="p">)</span>                   <span class="o">-</span> <span class="n">digitized</span> <span class="ow">and</span> <span class="n">usually</span> <span class="n">transformed</span>
+<span class="n">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>                     <span class="o">-</span> <span class="n">generic</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">Ports</span> <span class="p">(</span><span class="ow">in</span> <span class="ow">and</span><span class="o">/</span><span class="ow">or</span> <span class="n">out</span><span class="p">)</span>
+<span class="n">GainSection</span><span class="p">(</span><span class="n">Device</span><span class="p">)</span>                <span class="o">-</span> <span class="n">amplifiers</span><span class="p">,</span> <span class="n">attenuators</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span>
+<span class="n">Switch</span><span class="p">(</span><span class="n">Device</span><span class="p">)</span>                     <span class="o">-</span> <span class="mi">1</span><span class="n">xN</span><span class="p">,</span> <span class="n">Nx1</span><span class="p">,</span> <span class="mi">2</span><span class="n">x2</span> <span class="n">switches</span>
+<span class="n">Port</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>                       <span class="o">-</span> <span class="nb">object</span> <span class="n">which</span> <span class="n">passes</span> <span class="n">a</span> <span class="n">Signal</span>
+<span class="n">Observatory</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>                <span class="o">-</span> <span class="k">class</span> <span class="nc">for</span> <span class="n">describing</span> <span class="n">infrastructure</span>
+<span class="n">DeviceReadThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">)</span> <span class="o">-</span> <span class="n">gathers</span> <span class="n">data</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The module functions are::</dt><dd><p>ClassInstance     - provides a specific subclass object for a template class
+valid_property    - forces signal properties to follow a naming convention
+show_port_sources - print diagnostic information about ports
+link_ports        - connect an upstream port with downstream port(s)
+oldest_ancestor   - finds the top parent of the candidate
+find_source       - upstream object belong to a specified class</p>
+</dd>
+</dl>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.ClassInstance.html#MonitorControl.ClassInstance" title="MonitorControl.ClassInstance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClassInstance</span></code></a>(templateClass, subclass, …)</p></td>
+<td><p>This creates an instance of the specified sub-class</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.find_source.html#MonitorControl.find_source" title="MonitorControl.find_source"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_source</span></code></a>(device, source_class)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.link_ports.html#MonitorControl.link_ports" title="MonitorControl.link_ports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_ports</span></code></a>(inputs, outputs)</p></td>
+<td><p>Connect an upstream port with downstream port(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.oldest_ancestor.html#MonitorControl.oldest_ancestor" title="MonitorControl.oldest_ancestor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oldest_ancestor</span></code></a>(candidate)</p></td>
+<td><p>finds the top parent of the candidate</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.show_port_sources.html#MonitorControl.show_port_sources" title="MonitorControl.show_port_sources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_port_sources</span></code></a>(ports, header, loglevel)</p></td>
+<td><p>Helper method to print diagnostic information about ports.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.valid_property.html#MonitorControl.valid_property" title="MonitorControl.valid_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">valid_property</span></code></a>(keylist, ptype[, abort])</p></td>
+<td><p>All entries must have a substr matching an entry in the signal property list.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.ActionThread.html#MonitorControl.ActionThread" title="MonitorControl.ActionThread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionThread</span></code></a></p></td>
+<td><p>alias of <a class="reference internal" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.DeviceReadThread</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Beam.html#MonitorControl.Beam" title="MonitorControl.Beam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Beam</span></code></a>(name)</p></td>
+<td><p>Signal class for radiation arriving at a feed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.ComplexSignal.html#MonitorControl.ComplexSignal" title="MonitorControl.ComplexSignal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComplexSignal</span></code></a>(parent_signal[, pol, name])</p></td>
+<td><p>ComplexSignal class for an RF output from an orthomode or polarizer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Device.html#MonitorControl.Device" title="MonitorControl.Device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Device</span></code></a>(name[, inputs, output_names, active, …])</p></td>
+<td><p>Superclass for anything that receives, processes and outputs a signal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeviceReadThread</span></code></a>(actor, action[, name, suspend])</p></td>
+<td><p>One thread in a multi-threaded, multiple device instrument</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.GainSection.html#MonitorControl.GainSection" title="MonitorControl.GainSection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GainSection</span></code></a>(name[, inputs, output_names, …])</p></td>
+<td><p>Any device which increases or decreases the power level without changing the frequency and possible splits the signal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.IF.html#MonitorControl.IF" title="MonitorControl.IF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IF</span></code></a>(parent[, IF_type])</p></td>
+<td><p>Electrical signal out of a receiver, suitable for detection or digitization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.MCPublisher.html#MonitorControl.MCPublisher" title="MonitorControl.MCPublisher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MCPublisher</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.MonitorControlError.html#MonitorControl.MonitorControlError" title="MonitorControl.MonitorControlError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MonitorControlError</span></code></a>(args, message)</p></td>
+<td><p>Error handler for this module</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Observatory.html#MonitorControl.Observatory" title="MonitorControl.Observatory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Observatory</span></code></a>(name[, LO])</p></td>
+<td><p>Defines the Observatory class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Port.html#MonitorControl.Port" title="MonitorControl.Port"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Port</span></code></a>(parent, name[, source, signal])</p></td>
+<td><p>Class for a signal port in an Device.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Signal.html#MonitorControl.Signal" title="MonitorControl.Signal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Signal</span></code></a>([name, parent_signal, beam, pol, IF_type])</p></td>
+<td><p>Class for type of signal passing through a Port object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Spectrum.html#MonitorControl.Spectrum" title="MonitorControl.Spectrum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrum</span></code></a>(parent[, name, num_chans])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Switch.html#MonitorControl.Switch" title="MonitorControl.Switch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Switch</span></code></a>(name[, inputs, output_names, stype, …])</p></td>
+<td><p>Three basic switch types are recognized: “1xN”, “Nx1” and “2x2”.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="class-inheritance-diagram">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-12a3d1cec183ca5a07c267a92ee5a9d08968aaf4.png" alt="Inheritance diagram of MonitorControl.DeviceReadThread, MonitorControl.Beam, MonitorControl.ComplexSignal, MonitorControl.Device, MonitorControl.DeviceReadThread, MonitorControl.GainSection, MonitorControl.IF, MonitorControl.MCPublisher, MonitorControl.MonitorControlError, MonitorControl.Observatory, MonitorControl.Port, MonitorControl.Signal, MonitorControl.Spectrum, MonitorControl.Switch" usemap="#inheritanced225a80cdd" class="inheritance graphviz" /></div>
+<map id="inheritanced225a80cdd" name="inheritanced225a80cdd">
+<area shape="rect" id="node1" href="api/MonitorControl.Beam.html#MonitorControl.Beam" target="_top" title="Signal class for radiation arriving at a feed." alt="" coords="239,351,311,376"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Signal.html#MonitorControl.Signal" target="_top" title="Class for type of signal passing through a Port object." alt="" coords="44,425,116,451"/>
+<area shape="rect" id="node3" href="api/MonitorControl.ComplexSignal.html#MonitorControl.ComplexSignal" target="_top" title="ComplexSignal class for an RF output from an orthomode or polarizer." alt="" coords="215,400,335,425"/>
+<area shape="rect" id="node8" href="api/MonitorControl.IF.html#MonitorControl.IF" target="_top" title="Electrical signal out of a receiver, suitable for detection or digitization." alt="" coords="239,449,311,475"/>
+<area shape="rect" id="node15" href="api/MonitorControl.Spectrum.html#MonitorControl.Spectrum" target="_top" title="Spectrum" alt="" coords="233,499,317,524"/>
+<area shape="rect" id="node4" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="44,277,116,303"/>
+<area shape="rect" id="node7" href="api/MonitorControl.GainSection.html#MonitorControl.GainSection" target="_top" title="Any device which increases or decreases the power level without" alt="" coords="225,252,325,277"/>
+<area shape="rect" id="node16" href="api/MonitorControl.Switch.html#MonitorControl.Switch" target="_top" title="Three basic switch types are recognized: &quot;1xN&quot;, &quot;Nx1&quot; and &quot;2x2&quot;." alt="" coords="239,301,311,327"/>
+<area shape="rect" id="node5" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="203,203,347,228"/>
+<area shape="rect" id="node9" href="api/MonitorControl.MCPublisher.html#MonitorControl.MCPublisher" target="_top" title="MCPublisher" alt="" coords="395,153,497,179"/>
+<area shape="rect" id="node11" href="api/MonitorControl.MonitorControlError.html#MonitorControl.MonitorControlError" target="_top" title="Error handler for this module" alt="" coords="5,104,155,129"/>
+<area shape="rect" id="node12" href="api/MonitorControl.Observatory.html#MonitorControl.Observatory" target="_top" title="Defines the Observatory class." alt="" coords="29,55,131,80"/>
+<area shape="rect" id="node13" href="api/MonitorControl.Port.html#MonitorControl.Port" target="_top" title="Class for a signal port in an Device." alt="" coords="44,5,116,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.Antenna">
+<span id="monitorcontrol-antenna-package"></span><h2>MonitorControl.Antenna Package<a class="headerlink" href="#module-MonitorControl.Antenna" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Classes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Antenna.Antenna.html#MonitorControl.Antenna.Antenna" title="MonitorControl.Antenna.Antenna"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Antenna</span></code></a>(obs[, dss, LO, active, hardware])</p></td>
+<td><p>A subclass of Telescope that can connect to a server that is currently running.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Antenna.Telescope.html#MonitorControl.Antenna.Telescope" title="MonitorControl.Antenna.Telescope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Telescope</span></code></a>(obs[, dss, LO, active])</p></td>
+<td><p>Defines the Telescope class.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-0f087bfc4cc432400a543474d085491437ea2f03.png" alt="Inheritance diagram of MonitorControl.Antenna.Antenna, MonitorControl.Antenna.Telescope" usemap="#inheritancee556d4fe3b" class="inheritance graphviz" /></div>
+<map id="inheritancee556d4fe3b" name="inheritancee556d4fe3b">
+<area shape="rect" id="node1" href="api/MonitorControl.Antenna.Antenna.html#MonitorControl.Antenna.Antenna" target="_top" title="A subclass of Telescope that can connect to a server that is currently" alt="" coords="389,55,465,80"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Antenna.Telescope.html#MonitorControl.Antenna.Telescope" target="_top" title="Defines the Telescope class." alt="" coords="255,55,341,80"/>
+<area shape="rect" id="node5" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="135,79,207,104"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.FrontEnds">
+<span id="monitorcontrol-frontends-package"></span><h2>MonitorControl.FrontEnds Package<a class="headerlink" href="#module-MonitorControl.FrontEnds" title="Permalink to this headline">¶</a></h2>
+<p>Superclass for receiver front ends</p>
+<div class="section" id="id3">
+<h3>Classes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" title="MonitorControl.FrontEnds.FrontEnd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrontEnd</span></code></a>(name[, inputs, output_names, active])</p></td>
+<td><p>Device which converts EM radiation to electrical signals.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-a3183dbe4920f14b71d6fd2ccf50132c4f5362de.png" alt="Inheritance diagram of MonitorControl.FrontEnds.FrontEnd" usemap="#inheritanceed72801bea" class="inheritance graphviz" /></div>
+<map id="inheritanceed72801bea" name="inheritanceed72801bea">
+<area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" target="_top" title="Device which converts EM radiation to electrical signals." alt="" coords="125,5,204,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.Receivers">
+<span id="monitorcontrol-receivers-package"></span><h2>MonitorControl.Receivers Package<a class="headerlink" href="#module-MonitorControl.Receivers" title="Permalink to this headline">¶</a></h2>
+<p>Module for controlling and monitoring DSN science receivers</p>
+<p>This has the highest Receiver superclass which described the functionality of
+a generic receiver.</p>
+<div class="section" id="id5">
+<h3>Classes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Receivers.Receiver.html#MonitorControl.Receivers.Receiver" title="MonitorControl.Receivers.Receiver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Receiver</span></code></a>(name[, inputs, output_names, active])</p></td>
+<td><p>Device which converts RF signals to IF signals for detection or digitization</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-b3cd3e1c231425a2bfb05134ac092f54ff5b80b3.png" alt="Inheritance diagram of MonitorControl.Receivers.Receiver" usemap="#inheritance36273c54be" class="inheritance graphviz" /></div>
+<map id="inheritance36273c54be" name="inheritance36273c54be">
+<area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Receivers.Receiver.html#MonitorControl.Receivers.Receiver" target="_top" title="Device which converts RF signals to IF signals for detection or digitization" alt="" coords="125,5,204,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.BackEnds">
+<span id="monitorcontrol-backends-package"></span><h2>MonitorControl.BackEnds Package<a class="headerlink" href="#module-MonitorControl.BackEnds" title="Permalink to this headline">¶</a></h2>
+<p>Superclass for backend devices</p>
+<p>Classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Backend</span><span class="p">(</span><span class="n">Device</span><span class="p">)</span> <span class="n">which</span> <span class="n">has</span> <span class="n">private</span> <span class="k">class</span>
+  <span class="nc">DSProc</span><span class="p">(</span><span class="n">Device</span><span class="p">),</span> <span class="n">which</span> <span class="n">has</span> <span class="n">private</span> <span class="k">class</span>
+    <span class="nc">Channel</span><span class="p">(</span><span class="n">Device</span><span class="p">)</span>
+<span class="n">Processor</span><span class="p">(</span><span class="n">Device</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>Functions<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.freq_to_chan.html#MonitorControl.BackEnds.freq_to_chan" title="MonitorControl.BackEnds.freq_to_chan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_to_chan</span></code></a>(frequency, bandwidth, n_chans)</p></td>
+<td><p>Returns the channel number where a given frequency is to be found.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.get_freq_array.html#MonitorControl.BackEnds.get_freq_array" title="MonitorControl.BackEnds.get_freq_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_freq_array</span></code></a>(bandwidth, n_chans)</p></td>
+<td><p>Create an array of frequencies for the channels of a backend</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.get_smoothed_bandshape.html#MonitorControl.BackEnds.get_smoothed_bandshape" title="MonitorControl.BackEnds.get_smoothed_bandshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_smoothed_bandshape</span></code></a>(spectrum[, degree, …])</p></td>
+<td><p>Do a Gaussian smoothing of the spectrum and then fit a polynomial.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id8">
+<h3>Classes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" title="MonitorControl.BackEnds.Backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backend</span></code></a>(name[, inputs, output_names, …])</p></td>
+<td><p>Defines the Backend class, some assembly of DSP hardware.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.Processor.html#MonitorControl.BackEnds.Processor" title="MonitorControl.BackEnds.Processor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Processor</span></code></a>(parent, name[, inputs, …])</p></td>
+<td><p>Data processing device (computer) which provides additional processing</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id9">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-a23c9d5d81f02c8b1f9fad768478c962e7c4e525.png" alt="Inheritance diagram of MonitorControl.BackEnds.Backend, MonitorControl.BackEnds.Processor" usemap="#inheritancefb5a5dd739" class="inheritance graphviz" /></div>
+<map id="inheritancefb5a5dd739" name="inheritancefb5a5dd739">
+<area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="129,5,207,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,31,77,56"/>
+<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.Processor.html#MonitorControl.BackEnds.Processor" target="_top" title="Data processing device (computer) which provides additional processing" alt="" coords="125,55,211,80"/>
+</map></div>
+</div>
+</div>
+<div class="section" id="context-modules">
+<h1>Context Modules<a class="headerlink" href="#context-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-MonitorControl.Antenna.DSN">
+<span id="monitorcontrol-antenna-dsn-package"></span><h2>MonitorControl.Antenna.DSN Package<a class="headerlink" href="#module-MonitorControl.Antenna.DSN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3>Classes<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Antenna.DSN.DSN_Antenna.html#MonitorControl.Antenna.DSN.DSN_Antenna" title="MonitorControl.Antenna.DSN.DSN_Antenna"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSN_Antenna</span></code></a>(obs[, dss, LO, active, hardware])</p></td>
+<td><p>A subclass of Telescope that can connect to a server that is currently running.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id11">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-ec6f23abb8510eab530d3372ed3ce82652cb82cc.png" alt="Inheritance diagram of MonitorControl.Antenna.DSN.DSN_Antenna" usemap="#inheritance9d3da4f4e6" class="inheritance graphviz" /></div>
+<map id="inheritance9d3da4f4e6" name="inheritance9d3da4f4e6">
+<area shape="rect" id="node1" href="api/MonitorControl.Antenna.DSN.DSN_Antenna.html#MonitorControl.Antenna.DSN.DSN_Antenna" target="_top" title="A subclass of Telescope that can connect to a server that is currently" alt="" coords="447,128,557,153"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Antenna.Telescope.html#MonitorControl.Antenna.Telescope" target="_top" title="Defines the Telescope class." alt="" coords="283,79,370,104"/>
+<area shape="rect" id="node3" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="255,128,399,153"/>
+<area shape="rect" id="node7" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="135,79,207,104"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.FrontEnds.DSN">
+<span id="monitorcontrol-frontends-dsn-package"></span><h2>MonitorControl.FrontEnds.DSN Package<a class="headerlink" href="#module-MonitorControl.FrontEnds.DSN" title="Permalink to this headline">¶</a></h2>
+<p>Descriptions of DSN front ends without monitor and control functions</p>
+<div class="section" id="id12">
+<h3>Classes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.FrontEnds.DSN.DSN_fe.html#MonitorControl.FrontEnds.DSN.DSN_fe" title="MonitorControl.FrontEnds.DSN.DSN_fe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSN_fe</span></code></a>(name[, inputs, output_names])</p></td>
+<td><p>Class for DSN front ends with no M&amp;C functions</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id13">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-b4026cdb4ff13c5cdc9e943f53af5693d4f6b969.png" alt="Inheritance diagram of MonitorControl.FrontEnds.DSN.DSN_fe" usemap="#inheritancefaff27062c" class="inheritance graphviz" /></div>
+<map id="inheritancefaff27062c" name="inheritancefaff27062c">
+<area shape="rect" id="node1" href="api/MonitorControl.FrontEnds.DSN.DSN_fe.html#MonitorControl.FrontEnds.DSN.DSN_fe" target="_top" title="Class for DSN front ends with no M&amp;C functions" alt="" coords="252,5,324,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" target="_top" title="Device which converts EM radiation to electrical signals." alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.Receivers.DSN">
+<span id="monitorcontrol-receivers-dsn-package"></span><h2>MonitorControl.Receivers.DSN Package<a class="headerlink" href="#module-MonitorControl.Receivers.DSN" title="Permalink to this headline">¶</a></h2>
+<p>DSN receiver descriptions with no monitor and control functions</p>
+<div class="section" id="id14">
+<h3>Classes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Receivers.DSN.DSN_rx.html#MonitorControl.Receivers.DSN.DSN_rx" title="MonitorControl.Receivers.DSN.DSN_rx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSN_rx</span></code></a>(name[, inputs, output_names])</p></td>
+<td><p>Class for DSN receivers with no M&amp;C functions</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id15">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-4405d833c6c541a6b95feee5ecf73b4936de5d7f.png" alt="Inheritance diagram of MonitorControl.Receivers.DSN.DSN_rx" usemap="#inheritancec02e5ff0f6" class="inheritance graphviz" /></div>
+<map id="inheritancec02e5ff0f6" name="inheritancec02e5ff0f6">
+<area shape="rect" id="node1" href="api/MonitorControl.Receivers.DSN.DSN_rx.html#MonitorControl.Receivers.DSN.DSN_rx" target="_top" title="Class for DSN receivers with no M&amp;C functions" alt="" coords="252,5,324,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Receivers.Receiver.html#MonitorControl.Receivers.Receiver" target="_top" title="Device which converts RF signals to IF signals for detection or digitization" alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.BackEnds.DSN">
+<span id="monitorcontrol-backends-dsn-package"></span><h2>MonitorControl.BackEnds.DSN Package<a class="headerlink" href="#module-MonitorControl.BackEnds.DSN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id16">
+<h3>Classes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.DSN.WVSRbackend.html#MonitorControl.BackEnds.DSN.WVSRbackend" title="MonitorControl.BackEnds.DSN.WVSRbackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WVSRbackend</span></code></a>(name, collector[, inputs, …])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id17">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-b913c43a3166356a145da1c31bdb4ebe44e028a7.png" alt="Inheritance diagram of MonitorControl.BackEnds.DSN.WVSRbackend" usemap="#inheritance283271efa1" class="inheritance graphviz" /></div>
+<map id="inheritance283271efa1" name="inheritance283271efa1">
+<area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.DSN.WVSRbackend.html#MonitorControl.BackEnds.DSN.WVSRbackend" target="_top" title="WVSRbackend" alt="" coords="252,5,368,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+</map><div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+<p>Last revised by Tom Kuiper 2020 Aug 3.</p>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Single Dish Radio Astronomy Software Tools</a></li>
+<li><a class="reference internal" href="#note">Note</a></li>
+<li><a class="reference internal" href="#base-class-modules">Base Class Modules</a><ul>
+<li><a class="reference internal" href="#module-MonitorControl">MonitorControl Package</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.Antenna">MonitorControl.Antenna Package</a><ul>
+<li><a class="reference internal" href="#id1">Classes</a></li>
+<li><a class="reference internal" href="#id2">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.FrontEnds">MonitorControl.FrontEnds Package</a><ul>
+<li><a class="reference internal" href="#id3">Classes</a></li>
+<li><a class="reference internal" href="#id4">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.Receivers">MonitorControl.Receivers Package</a><ul>
+<li><a class="reference internal" href="#id5">Classes</a></li>
+<li><a class="reference internal" href="#id6">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds">MonitorControl.BackEnds Package</a><ul>
+<li><a class="reference internal" href="#id7">Functions</a></li>
+<li><a class="reference internal" href="#id8">Classes</a></li>
+<li><a class="reference internal" href="#id9">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-modules">Context Modules</a><ul>
+<li><a class="reference internal" href="#module-MonitorControl.Antenna.DSN">MonitorControl.Antenna.DSN Package</a><ul>
+<li><a class="reference internal" href="#id10">Classes</a></li>
+<li><a class="reference internal" href="#id11">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.FrontEnds.DSN">MonitorControl.FrontEnds.DSN Package</a><ul>
+<li><a class="reference internal" href="#id12">Classes</a></li>
+<li><a class="reference internal" href="#id13">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.Receivers.DSN">MonitorControl.Receivers.DSN Package</a><ul>
+<li><a class="reference internal" href="#id14">Classes</a></li>
+<li><a class="reference internal" href="#id15">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds.DSN">MonitorControl.BackEnds.DSN Package</a><ul>
+<li><a class="reference internal" href="#id16">Classes</a></li>
+<li><a class="reference internal" href="#id17">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api/MonitorControl.ClassInstance.html"
+                        title="next chapter">ClassInstance</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api/MonitorControl.ClassInstance.html" title="ClassInstance"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Single Dish Radio Astronomy Software Tools</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+<map id="inheritanceed72801bea" name="inheritanceed72801bea">
+<area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" target="_top" title="Device which converts EM radiation to electrical signals." alt="" coords="125,5,204,31"/>
+</map>

@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassInstance &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="find_source" href="MonitorControl.find_source.html" />
+    <link rel="prev" title="Single Dish Radio Astronomy Software Tools" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.find_source.html" title="find_source"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Single Dish Radio Astronomy Software Tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ClassInstance</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="classinstance">
+<h1>ClassInstance<a class="headerlink" href="#classinstance" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="MonitorControl.ClassInstance">
+<code class="sig-prename descclassname">MonitorControl.</code><code class="sig-name descname">ClassInstance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">templateClass</span></em>, <em class="sig-param"><span class="n">subclass</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.ClassInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates an instance of the specified sub-class</p>
+<p>It passes the arguments, if any, to the sub-class initializer.  An
+example of using this function::
+&gt;&gt;&gt;  IFsw = ClassInstance(Switch, JFW50MS287, lab, “Nx1”, 0)
+(The last argument is required for the JFW50MS287 to specify which output
+port it is associated with.)</p>
+<p class="rubric">Notes</p>
+<p><strong>Acknowledgment</strong></p>
+<p>This approach was recommended by Barzia Tehrani on 2012 Oct 14, 11:36 am:
+‘I have seen Instantiate helper methods just to bridge the gap between
+different languages.’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subclass must provide the template with all the arguments that it</strong> (<em>The</em>) – </p></li>
+<li><p><strong>requires.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>:param :
+:type : param templateClass : the superclass for this device
+:param :
+:type : type  templateClass : class
+:param :
+:type : param subclass : the implementation of this specific device
+:param :
+:type : type  subclass : class
+:param :
+:type : param args : sequential arguments required to initialize the subclass
+:param :
+:type : param kwargs : keyword arguments required to intitialize the subclass</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Single Dish Radio Astronomy Software Tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.find_source.html"
+                        title="next chapter">find_source</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.ClassInstance.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.find_source.html" title="find_source"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Single Dish Radio Astronomy Software Tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ClassInstance</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

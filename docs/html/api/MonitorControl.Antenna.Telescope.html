@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telescope &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Antenna" href="MonitorControl.Antenna.Antenna.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.Antenna.html" title="Antenna"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Telescope</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="telescope">
+<h1>Telescope<a class="headerlink" href="#telescope" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.Antenna.Telescope">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.Antenna.</code><code class="sig-name descname">Telescope</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">dss</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">LO</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Antenna.Telescope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.Device.html#MonitorControl.Device" title="MonitorControl.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.Device</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Astronomy.DSN_coordinates.DSS</span></code></p>
+<p>Defines the Telescope class.</p>
+<p>This class has methods and attributes to describe (an eventually
+control) a radio telescope.
+Telescope inherits from the Observatory class</p>
+<p>Since this is for a single-dish telescope, there should be only one
+instance of this class. It is identified with the FITS keyword TELESCOP.</p>
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">A Telescope() instance has these additional attributes::</code></dt>
+<dd><ul class="simple">
+<li><p>active -       can be set to False to indicate that it is unservicable</p></li>
+<li><p>data -         a dictionary with parameters for location, pointing, etc.</p></li>
+<li><dl class="simple">
+<dt>front_ends -   a list of front end objects on the telescope.  This is</dt><dd><p>generated automatically as the front-end objects are
+created</p>
+</dd>
+</dl>
+</li>
+<li><p>receivers -    a list of down-converter objects on the telescope</p></li>
+<li><p>backends   - a list of signal processing and recording devices</p></li>
+</ul>
+</dd></dl>
+
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Antenna.Telescope.name" title="MonitorControl.Antenna.Telescope.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="MonitorControl.Antenna.Telescope.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#MonitorControl.Antenna.Telescope.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.Antenna.Antenna.html"
+                        title="previous chapter">Antenna</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.Antenna.Telescope.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.Antenna.html" title="Antenna"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Telescope</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

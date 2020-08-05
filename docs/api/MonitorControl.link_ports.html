@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>link_ports &#8212; Physics 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="oldest_ancestor" href="MonitorControl.oldest_ancestor.html" />
+    <link rel="prev" title="find_source" href="MonitorControl.find_source.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.oldest_ancestor.html" title="oldest_ancestor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.find_source.html" title="find_source"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">link_ports</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="link-ports">
+<h1>link_ports<a class="headerlink" href="#link-ports" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="MonitorControl.link_ports">
+<code class="sig-prename descclassname">MonitorControl.</code><code class="sig-name descname">link_ports</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">outputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.link_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect an upstream port with downstream port(s).</p>
+<p>This connects an upstream port with downstream port(s), both of which are
+dicts. The source of the downstream port(s), given by ‘outputs’, is the
+upstream port. In the general case there is one input port and one or more
+output ports.  So ‘outputs’, at least, must be a dict. If there is more than
+one upstream ports for a downstream port (think of a quadrature hybrid as an
+example) then the ‘source’ attribute is a list. The Device initialization
+must then change ‘source’ from a port to a list of ports.</p>
+<p>Example: connect a device input to its outputs. (See FrontEnd)</p>
+<p>Example: connect a device output to the downstream device inputs. (See
+KurtSpec)</p>
+<p>:param inputs : upstream port(s)
+:type  inputs : dict</p>
+<p>:param outputs : downstream port(s)
+:type  outputs : dict</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.find_source.html"
+                        title="previous chapter">find_source</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.oldest_ancestor.html"
+                        title="next chapter">oldest_ancestor</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.link_ports.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.oldest_ancestor.html" title="oldest_ancestor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.find_source.html" title="find_source"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Physics 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">link_ports</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>
