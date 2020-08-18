@@ -3,12 +3,12 @@ import sys
 from math import pi
 
 import MonitorControl as MC
-import Astronomy.DSN_coordinates as DSN
+import Astronomy.DSN_coordinates as coords
 
 logger = logging.getLogger(__name__)
 
 
-class Telescope(MC.Device, DSN.DSS):
+class Telescope(MC.Device, coords.DSS):
   """
   Defines the Telescope class.
 
@@ -58,7 +58,7 @@ class Telescope(MC.Device, DSN.DSS):
     name = "DSS-"+str(dss)
     mylogger = logging.getLogger(logger.name+".Telescope")
     mylogger.debug("__init__: for Telescope %s", name)
-    DSN.DSS.__init__(self, dss)
+    coords.DSS.__init__(self, dss)
     MC.Device.__init__(self, name)
     self.logger = mylogger
     # An observatory has no outputs of type Port but this at least gives some
@@ -96,7 +96,7 @@ class Antenna(Telescope):
         super(Antenna, self).__init__(obs, dss=dss, LO=LO, active=active)
 
         if hardware:
-            tunnel = Pyro4Tunnel(remote_server_name="localhost",
+            tunnel = Pyro5Tunnel(remote_server_name="localhost",
                                 local=True,
                                 ns_port=50000,
                                 ns_host="localhost")

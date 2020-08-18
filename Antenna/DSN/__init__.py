@@ -1,4 +1,3 @@
-
 import threading
 import datetime
 import random
@@ -9,19 +8,29 @@ try:
 except ImportError as err:
     import queue
 
-from support.pyro import asyncs
+#from support.pyro import asyncs
+import Pyro5.api
 import support.hdf5_util as hdf5
 import MonitorControl as MC
 
-
+class CallbackHandler(object):
+    """
+    """
+    @Pyro5.api.expose
+    @Pyro5.api.callback
+    def finished(self, duration):
+        """
+        """
+        print("finished: %d" % duration)
+        
 class DSN_Antenna(MC.Antenna.Telescope, MC.DeviceReadThread, hdf5.HDF5Mixin):
     """
     A subclass of Telescope that can connect to a server that is currently
     running.
 
     Attributes:
-        hardware (Proxy object): A Proxy object (either Pyro4.Proxy or
-            asyncs.AsyncProxy) corresponding to a downstream hardware server
+        hardware (Proxy object): A Proxy object (Pyro5.api.Proxy) corresponding
+                                 to a downstream hardware server
     """
     monitor_items = [
         "AzimuthAngle",
@@ -56,6 +65,7 @@ class DSN_Antenna(MC.Antenna.Telescope, MC.DeviceReadThread, hdf5.HDF5Mixin):
             hardware (bool, optional): whether or not to connect to hardware
         """
         MC.Antenna.Telescope.__init__(self, obs, dss=dss, LO=LO, active=active)
+        # thread for reading from NMC server
         MC.DeviceReadThread.__init__(
             self, self,
             self.action,
@@ -65,7 +75,7 @@ class DSN_Antenna(MC.Antenna.Telescope, MC.DeviceReadThread, hdf5.HDF5Mixin):
         hdf5.HDF5Mixin.__init__(self)
         if hardware:
             uri = "PYRO:APC@localhost:50001"
-            self.hardware = asyncs.AsyncProxy(uri)
+            self.hardware = Pyro5.api.Proxy(uri)  # asyncs.AsyncProxy(uri)
         else:
             self.hardware = None
 
