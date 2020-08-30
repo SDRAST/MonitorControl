@@ -13,3 +13,6 @@
 [submodule "FrontEnds/DSN"]
 	path = FrontEnds/DSN
 	url = git@github.com:SDRAST/FrontEnds_DSN.git
+[submodule "Receivers/DSN"]
+	path = Receivers/DSN
+	url = git@github.com:SDRAST/Receivers_DSN.git
