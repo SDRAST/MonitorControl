@@ -4,3 +4,6 @@
 [submodule "BackEnds/DSN"]
 	path = BackEnds/DSN
 	url = git@github.com:SDRAST/BackEnds_DSN.git
+[submodule "FrontEnds/K_band"]
+	path = FrontEnds/K_band
+	url = git@github.com:SDRAST/FrontEnds_K_band.git
