@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAOclient &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="create_arg_parser" href="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html" />
+    <link rel="prev" title="roach_name_adaptor" href="MonitorControl.BackEnds.ROACH1.roach_name_adaptor.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html" title="create_arg_parser"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.roach_name_adaptor.html" title="roach_name_adaptor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAOclient</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="saoclient">
+<h1>SAOclient<a class="headerlink" href="#saoclient" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.ROACH1.SAOclient.</code><code class="sig-name descname">SAOclient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hardware</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" title="MonitorControl.BackEnds.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.BackEnds.Backend</span></code></a></p>
+<p>SAO 32K-channel spectrometer</p>
+<p>consists of four ROACH boards, each running the same firmware. It takes in
+four IF class signals and outputs digital data (spectra) for each channel.</p>
+<p>The details of this class depend on the SAO spectrometer firmware in the
+ROACH processors.</p>
+<p>This is a client class which uses the server controlling the spectrometer.</p>
+<dl class="simple">
+<dt>Attributes::</dt><dd><p>bandwidth:
+combiner:
+combinerQueue:
+freqs:
+hardware:
+last_scan:
+logger:
+name:
+num_chan:
+parent:
+roachnames:
+scans:
+spectra_dict:
+titles:</p>
+</dd>
+</dl>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.input_names" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.input_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">input_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.num_chan" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.num_chan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_chan</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.scan_finished" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.scan_finished"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scan_finished</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.combine_spectra" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.combine_spectra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combine_spectra</span></code></a>()</p></td>
+<td><p>combine ROACH recors into a spectrometer record</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_data" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data</span></code></a>(roach)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_last_spectrum" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_last_spectrum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_spectrum</span></code></a>()</p></td>
+<td><p>serve last spectrum of the ones coming in</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_spectrum_from_file" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_spectrum_from_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spectrum_from_file</span></code></a>(scan, res)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.help" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">help</span></code></a>([kind])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.init_combiner" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.init_combiner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_combiner</span></code></a>()</p></td>
+<td><p>combines records from different ROACHs into one packet</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.inner_handler" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.inner_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inner_handler</span></code></a>(res)</p></td>
+<td><p>There is one of these for each ROACH</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.new_start_recording" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.new_start_recording"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_start_recording</span></code></a>([parent, n_accums, …])</p></td>
+<td><p>start a series of scans</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.startRoachHandler" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.startRoachHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startRoachHandler</span></code></a>(rname)</p></td>
+<td><p>We need a method in which the ROACH name is not an argument</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_handler" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_handler</span></code></a>(res)</p></td>
+<td><p>receive and package spectra obtained from an integration by all ROACHs</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_recording" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_recording"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_recording</span></code></a>([parent, n_accums, …])</p></td>
+<td><p>start a series of scans</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.stop_recording" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.stop_recording"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop_recording</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.input_names">
+<code class="sig-name descname">input_names</code><em class="property"> = {'sao64k-1': 'SAO1', 'sao64k-2': 'SAO2', 'sao64k-3': 'SAO3', 'sao64k-4': 'SAO4'}</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.input_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.num_chan">
+<code class="sig-name descname">num_chan</code><em class="property"> = 32768</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.num_chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.scan_finished">
+<code class="sig-name descname">scan_finished</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.scan_finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.combine_spectra">
+<code class="sig-name descname">combine_spectra</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.combine_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>combine ROACH recors into a spectrometer record</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_data">
+<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">roach</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_last_spectrum">
+<code class="sig-name descname">get_last_spectrum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_last_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>serve last spectrum of the ones coming in</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_spectrum_from_file">
+<code class="sig-name descname">get_spectrum_from_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan</span></em>, <em class="sig-param"><span class="n">res</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.get_spectrum_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.help">
+<code class="sig-name descname">help</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.init_combiner">
+<code class="sig-name descname">init_combiner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.init_combiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>combines records from different ROACHs into one packet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.inner_handler">
+<code class="sig-name descname">inner_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">res</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.inner_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is one of these for each ROACH</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.new_start_recording">
+<code class="sig-name descname">new_start_recording</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_accums</span><span class="o">=</span><span class="default_value">120</span></em>, <em class="sig-param"><span class="n">integration_time</span><span class="o">=</span><span class="default_value">5.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.new_start_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>start a series of scans</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.startRoachHandler">
+<code class="sig-name descname">startRoachHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.startRoachHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>We need a method in which the ROACH name is not an argument</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_handler">
+<code class="sig-name descname">start_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">res</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>receive and package spectra obtained from an integration by all ROACHs</p>
+<p>This receives spectra from ROACHs and combines them into one array.
+Each is labelled with its scan and recorded number. The spectra are
+collected in a multi-level dict keyed on scan number, record number, and
+ROACH name.</p>
+<dl class="simple">
+<dt>The SAObackend sends (via SAOspecServer) messages with five items:</dt><dd><p>status - ‘done’ or ‘record’,
+name   - the ROACH name, e.g., ‘sao64k-1’,
+file   - full path to the data file
+scan   - current scan number,
+accum  - current accumulation number (-1 for status ‘done’),
+data   - the spectrum (status ‘record’) or time (status ‘done’)</p>
+</dd>
+</dl>
+<p>20190820: To avoid problem callback we do not send data but the file
+where the data are stored.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_recording">
+<code class="sig-name descname">start_recording</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_accums</span><span class="o">=</span><span class="default_value">120</span></em>, <em class="sig-param"><span class="n">integration_time</span><span class="o">=</span><span class="default_value">5.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.start_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>start a series of scans</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.stop_recording">
+<code class="sig-name descname">stop_recording</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.stop_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.roach_name_adaptor.html"
+                        title="previous chapter">roach_name_adaptor</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html"
+                        title="next chapter">create_arg_parser</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html" title="create_arg_parser"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.roach_name_adaptor.html" title="roach_name_adaptor"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAOclient</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAObackend &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SAOfwif" href="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html" />
+    <link rel="prev" title="main" href="MonitorControl.BackEnds.ROACH1.simulator.main.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html" title="SAOfwif"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.main.html" title="main"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAObackend</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="saobackend">
+<h1>SAObackend<a class="headerlink" href="#saobackend" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.ROACH1.simulator.</code><code class="sig-name descname">SAObackend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">roaches</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">roachlist</span><span class="o">=</span><span class="default_value">['roach1', 'roach2', 'roach3', 'roach4']</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'roach'</span></em>, <em class="sig-param"><span class="n">synth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">write_to_disk</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">TAMS_logging</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">support.PropertiedClass</span></code></p>
+<p>A simulated multi-ROACH 32k-channel x 4-IF spectrometer</p>
+<p>An SAO back end normally comprises four ROACH boards using TAMS 32K channel
+firmware.  We will generalize it, though, to use any number of ROACH boards.</p>
+<p>Attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span>       <span class="o">-</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="n">instance</span>
+<span class="n">name</span>         <span class="o">-</span> <span class="n">name</span> <span class="k">for</span> <span class="n">the</span> <span class="n">backend</span>
+<span class="n">reader</span>       <span class="o">-</span> <span class="nb">dict</span> <span class="n">of</span> <span class="n">DeviceReadThread</span> <span class="n">objects</span> <span class="n">keyed</span> <span class="n">to</span> <span class="n">roach</span> <span class="n">names</span>
+<span class="n">roach</span>        <span class="o">-</span> <span class="nb">dict</span> <span class="n">of</span> <span class="n">SAOfwif</span> <span class="n">objects</span> <span class="n">keyed</span> <span class="n">to</span> <span class="n">their</span> <span class="n">names</span>
+</pre></div>
+</div>
+<p>The backend manages the scans for the child ROACH objects.  Their scan
+numbers are updated when the required number of records have been recorded.</p>
+<p>Typically, the SAO client is an attribute of the main client so that the
+server’s methods are called with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">spectrometer</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">method</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bandwidth" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bandwidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bandwidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bitstream" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bitstream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bitstream</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.firmware" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.firmware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">firmware</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqlist" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqlist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freqlist</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.roachnames" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.roachnames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">roachnames</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.template" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">template</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.calibrate" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.calibrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_fans" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_fans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_fans</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_temperatures" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_temperatures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_temperatures</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.clock_synth_status" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.clock_synth_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clock_synth_status</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.fft_shift_set" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.fft_shift_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fft_shift_set</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqs" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freqs</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_input" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ADC_input</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_samples" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ADC_samples</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_adc_temp" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_adc_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_adc_temp</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ambient_temp" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ambient_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ambient_temp</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_bandwidth" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_bandwidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bandwidth</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_clk" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_clk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_clk</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_accums" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_accums"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_accums</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_scans" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_scans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_scans</span></code></a>()</p></td>
+<td><p>report the current scan number for each ROACH</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_firmware" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_firmware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_firmware</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.help" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">help</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.initialize" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.last_spectra" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.last_spectra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_spectra</span></code></a>([dolog, squish])</p></td>
+<td><p>Get the current spectrum from each ROACH</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.quit" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.quit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quit</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.read_register" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.read_register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_register</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.reset_scans" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.reset_scans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_scans</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_get" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rf_gain_get</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_set" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rf_gain_set</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_state" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rf_state</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.set_integration" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.set_integration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration</span></code></a>(int_time)</p></td>
+<td><p>Sets all ROACHes to the same integration time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.start" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>([n_accums, integration_time, callback])</p></td>
+<td><p>start a scan consisting of ‘n_accums’ accumulations</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.sync_start" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.sync_start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_start</span></code></a>(n, *args)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bandwidth">
+<code class="sig-name descname">bandwidth</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bandwidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bitstream">
+<code class="sig-name descname">bitstream</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.bitstream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.firmware">
+<code class="sig-name descname">firmware</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.firmware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqlist">
+<code class="sig-name descname">freqlist</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqlist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.roachnames">
+<code class="sig-name descname">roachnames</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.roachnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.template">
+<code class="sig-name descname">template</code><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.calibrate">
+<code class="sig-name descname">calibrate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_fans">
+<code class="sig-name descname">check_fans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_fans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_temperatures">
+<code class="sig-name descname">check_temperatures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.check_temperatures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.clock_synth_status">
+<code class="sig-name descname">clock_synth_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.clock_synth_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.fft_shift_set">
+<code class="sig-name descname">fft_shift_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.fft_shift_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqs">
+<code class="sig-name descname">freqs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.freqs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_input">
+<code class="sig-name descname">get_ADC_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_input" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_samples">
+<code class="sig-name descname">get_ADC_samples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ADC_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_adc_temp">
+<code class="sig-name descname">get_adc_temp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_adc_temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ambient_temp">
+<code class="sig-name descname">get_ambient_temp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_ambient_temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_bandwidth">
+<code class="sig-name descname">get_bandwidth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_bandwidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_clk">
+<code class="sig-name descname">get_clk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_clk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_accums">
+<code class="sig-name descname">get_current_accums</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_accums" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_scans">
+<code class="sig-name descname">get_current_scans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_current_scans" title="Permalink to this definition">¶</a></dt>
+<dd><p>report the current scan number for each ROACH</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_firmware">
+<code class="sig-name descname">get_firmware</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.get_firmware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.help">
+<code class="sig-name descname">help</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.initialize">
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.last_spectra">
+<code class="sig-name descname">last_spectra</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dolog</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">squish</span><span class="o">=</span><span class="default_value">16</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.last_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current spectrum from each ROACH</p>
+<p>Returns a list of lists that is compatible with Google Charts LineChart</p>
+<p>We cheat a little in assuming that each ROACH has the same scan and
+spectrum numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- return log10 of data if True; negative number become 0</strong> (<em>dolog</em>) – </p></li>
+<li><p><strong>- number of channels to average</strong> (<em>squish</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.quit">
+<code class="sig-name descname">quit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.quit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.read_register">
+<code class="sig-name descname">read_register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.read_register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.reset_scans">
+<code class="sig-name descname">reset_scans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.reset_scans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_get">
+<code class="sig-name descname">rf_gain_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_set">
+<code class="sig-name descname">rf_gain_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_gain_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_state">
+<code class="sig-name descname">rf_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rf_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.set_integration">
+<code class="sig-name descname">set_integration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">int_time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.set_integration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets all ROACHes to the same integration time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_accums</span><span class="o">=</span><span class="default_value">120</span></em>, <em class="sig-param"><span class="n">integration_time</span><span class="o">=</span><span class="default_value">10.0</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>start a scan consisting of ‘n_accums’ accumulations</p>
+<p>Adapted from SAObackend.start and SAObackend.action</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.sync_start">
+<code class="sig-name descname">sync_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAObackend.sync_start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.simulator.main.html"
+                        title="previous chapter">main</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html"
+                        title="next chapter">SAOfwif</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html" title="SAOfwif"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.main.html" title="main"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAObackend</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

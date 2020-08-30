@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAOfwif &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SAOspecServer" href="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html" />
+    <link rel="prev" title="SAObackend" href="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html" title="SAOspecServer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html" title="SAObackend"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAOfwif</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="saofwif">
+<h1>SAOfwif<a class="headerlink" href="#saofwif" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.ROACH1.simulator.</code><code class="sig-name descname">SAOfwif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach</span><span class="o">=</span><span class="default_value">'roach1'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'sao'</span></em>, <em class="sig-param"><span class="n">firmware_server</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">firmware_key</span><span class="o">=</span><span class="default_value">'sao_spec'</span></em>, <em class="sig-param"><span class="n">port</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach_log_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">clock_synth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">integr_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">writer_queue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">write_to_disk</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">TAMS_logging</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">timing_report</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.DeviceReadThread</span></code></a></p>
+<p>Class for one ROACH with SAO 32K spectrometer firmware</p>
+<p>Attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">acc_count</span> <span class="o">-</span> <span class="n">current</span> <span class="n">accumulation</span> <span class="n">number</span>
+<span class="n">gains</span>     <span class="o">-</span> <span class="n">RF</span> <span class="n">gain</span> <span class="p">(</span><span class="n">only</span> <span class="mi">1</span> <span class="n">ADC</span> <span class="ow">and</span> <span class="mi">1</span> <span class="n">RF</span> <span class="nb">input</span><span class="p">)</span>
+<span class="n">data_file_obj</span>  <span class="o">-</span> <span class="n">where</span> <span class="n">raw</span> <span class="n">data</span> <span class="n">are</span> <span class="n">stored</span>
+<span class="n">logger</span>    <span class="o">-</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="n">instance</span>
+<span class="n">max_count</span> <span class="o">-</span> <span class="n">number</span> <span class="n">of</span> <span class="n">accumulation</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">scan</span>
+<span class="n">rf_gain</span>   <span class="o">-</span> <span class="n">gain</span> <span class="n">of</span> <span class="n">RF</span> <span class="nb">input</span>
+<span class="n">scan</span>      <span class="o">-</span> <span class="n">number</span> <span class="n">of</span> <span class="n">the</span> <span class="n">current</span> <span class="n">group</span> <span class="n">of</span> <span class="n">accumulations</span>
+</pre></div>
+</div>
+<p>Attributes inherited from SAOhwif:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fft_shift</span> <span class="o">-</span> <span class="n">contents</span> <span class="n">of</span> <span class="n">register</span> <span class="n">fft_shift</span>
+<span class="n">fpga</span>      <span class="o">-</span> <span class="n">ROACH</span> <span class="n">hardware</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.accum_reg_keys" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.accum_reg_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accum_reg_keys</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.command_help" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.command_help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">command_help</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.file_attr_keys" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.file_attr_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">file_attr_keys</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.max_data_file_size" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.max_data_file_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_data_file_size</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.scan_attr_keys" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.scan_attr_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scan_attr_keys</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ADC_samples" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ADC_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ADC_samples</span></code></a>([trig_level, timeout])</p></td>
+<td><p>Returns ADC samples.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.action" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">action</span></code></a>()</p></td>
+<td><p>This provides the action for the child readers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.calibrate" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.calibrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate</span></code></a>()</p></td>
+<td><p>Calibrate the FPGA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_get" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctrl_get</span></code></a>()</p></td>
+<td><p>Reads and decodes the values from the control register.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_set" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ctrl_set</span></code></a>(**kwargs)</p></td>
+<td><p>Set control register bits.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.fft_shift_set" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.fft_shift_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fft_shift_set</span></code></a>([fft_shift_schedule])</p></td>
+<td><p>Sets the FFT shift schedule (divide-by-two) on each FFT stage.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ADC_input" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ADC_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ADC_input</span></code></a>()</p></td>
+<td><p>Get the ADC input level properties and a set of samples</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_RF_input" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_RF_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_RF_input</span></code></a>()</p></td>
+<td><p>Get the mean RF section input level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_accum_count" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_accum_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_accum_count</span></code></a>()</p></td>
+<td><p>Returns the current number of raw spectra accumulated</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_adc_temp" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_adc_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_adc_temp</span></code></a>()</p></td>
+<td><p>Get the adc temp</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ambient_temp" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ambient_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ambient_temp</span></code></a>()</p></td>
+<td><p>Get the ambient ADC temp</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_clk" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_clk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_clk</span></code></a>()</p></td>
+<td><p>Get an estimate of the FPGA clock speed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_firmware_keys" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_firmware_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_firmware_keys</span></code></a>()</p></td>
+<td><p>Sets (and returns) the names of the firmwares available on this host</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_gains" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_gains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_gains</span></code></a>()</p></td>
+<td><p>Get the gains of the RF channels</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_spectrum</span></code></a>()</p></td>
+<td><p>Suggested by Jonathan.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_params" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([key])</p></td>
+<td><p>Look up the parameters for the design identified by the key</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_spectrum" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_spectrum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spectrum</span></code></a>()</p></td>
+<td><p>This is what read hardware would do.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.help" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">help</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.initialize_roach" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.initialize_roach"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_roach</span></code></a>([RF_gain, RFid, …])</p></td>
+<td><p>Initialises the system to defaults.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_get" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integr_time_get</span></code></a>()</p></td>
+<td><p>Get the accumulation length.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_set" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integr_time_set</span></code></a>([integr_time])</p></td>
+<td><p>Set the accumulation length in seconds</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.quit" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.quit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quit</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.read_register" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.read_register"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_register</span></code></a>(register)</p></td>
+<td><p>To allow a client to read register</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.sync_start" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.sync_start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_start</span></code></a>()</p></td>
+<td><p>Initiate the sync pulses</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.accum_reg_keys">
+<code class="sig-name descname">accum_reg_keys</code><em class="property"> = ['status', 'sync_start', 'sys_scratchpad', 'acc_cnt', 'sync_cnt', 'sys_clkcounter']</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.accum_reg_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.command_help">
+<code class="sig-name descname">command_help</code><em class="property"> = &quot;\n    ADC_samples(trig_level=-1, timeout=1)\n       Returns ADC samples.\n    integr_time_set(integr_time=1)\n       Set the accumulation length in seconds\n    ctrl_get()\n       Reads and decodes the values from the control register.\n    ctrl_set(**kwargs)\n       Set control register bits.\n\n       This is designed to do the minimum number of writes to the 'control'\n       register, allowing bits simultaneously to be set, unset, toggled and\n       pulsed.\n    fft_shift_set(fft_shift_schedule=0)\n       Sets the FFT shift schedule (divide-by-two) on each FFT stage.\n    get_ADC_input()\n       Get the ADC input level properties and a set of samples\n    get_RF_input()\n       Get the mean RF section input level. This is the ADC level minus the\n       gain of the RF section\n    get_accum_count()\n    get_gains()\n       Get the gains of the RF channels. This only works for ADC type 'katadc'.\n       The gain is set by a 20 dB amplifier followed by a -31.5 to 0 dB\n       attenuator controllable in 0.5 dB steps.  So the actual gain goes from\n       -11.5 dB to +20 dB in 0.5 dB steps.\n    get_next_spectrum()\n       invokes ``get_spectrum`` to get the spectrum from the spectrometer\n    get_spectrum()\n    initialize_roach(RF_gain=10, integr_time=1)\n       Initialises the system to defaults.\n    quit()\n    read_fpga_uscram(store=0)\n    rf_gain_set(gain=20)\n       Enables the RF switch and configures the RF attenuators.\n       For KATADC boards. KATADC's valid range is -11.5 to 20dB. The RF switch\n       is in MSb.\n    write_to_data_file(data)\n       Save a record\n    sync_start()\n       Initiate the sync pulses\n\n    Methods inherited from MonitorControl.BackEnds.ROACH1.ROACHhwif.ROACHhwif:\n\n    get_params(key)\n       Look up the parameters for the design identified by the key\n    get_register_values()\n       Report on the contents of regular registers.\n    listdev()\n       List the devices defined in the firmware.\n    report()\n       Get a summary of information for this ROACH\n\n    Methods inherited from MonitorControl.BackEnds.ROACH1.ROACHhwif.ROACHppc:\n\n    check_borph_status()\n       See if the borphserver is running bormally and fix it if not.\n    get_bitfile()\n       What boffile is running?\n    get_boffiles(filter_tutorials=True)\n       What boffiles does it have?\n    get_firmware_ID()\n       Get the firmware IDs of the currently loaded boffiles\n    get_firmware_keys()\n       Sets (and returns) the names of the firmwares available on this host\n    is_alive()\n       Is it alive?\n    roach_command(self, command)\n       Send a command to the ROACH PPC.&quot;</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.command_help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.file_attr_keys">
+<code class="sig-name descname">file_attr_keys</code><em class="property"> = ['sys_board_id', 'sys_rev', 'sys_rev_rcs']</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.file_attr_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.max_data_file_size">
+<code class="sig-name descname">max_data_file_size</code><em class="property"> = 1000000000.0</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.max_data_file_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.scan_attr_keys">
+<code class="sig-name descname">scan_attr_keys</code><em class="property"> = ['control', 'fft_shift', 'adc_ctrl0', 'acc_len']</em><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.scan_attr_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ADC_samples">
+<code class="sig-name descname">ADC_samples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trig_level</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ADC_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ADC samples.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.action">
+<code class="sig-name descname">action</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This provides the action for the child readers.</p>
+<p>The ‘DeviceReadThread’ objects created during initialization invoke their
+parents’ (this object) ‘action’ method.</p>
+<p>It keeps track of the number of spectra in a scan. It saves the data with
+associated header values for each spectrum.  When the number of
+spectra equals the requested number, it stops and reports.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.calibrate">
+<code class="sig-name descname">calibrate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calibrate the FPGA.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_get">
+<code class="sig-name descname">ctrl_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads and decodes the values from the control register.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_set">
+<code class="sig-name descname">ctrl_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.ctrl_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set control register bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.fft_shift_set">
+<code class="sig-name descname">fft_shift_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fft_shift_schedule</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.fft_shift_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the FFT shift schedule (divide-by-two) on each FFT stage.</p>
+<p>Input is an integer representing a binary bitmask for shifting.
+If not specified as a parameter to this function (or a negative
+value is supplied), it programs the default level.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ADC_input">
+<code class="sig-name descname">get_ADC_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ADC_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ADC input level properties and a set of samples</p>
+<p>This is input to the chip</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_RF_input">
+<code class="sig-name descname">get_RF_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_RF_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mean RF section input level.</p>
+<p>This is the ADC level minus the gain of the RF section</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_accum_count">
+<code class="sig-name descname">get_accum_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_accum_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current number of raw spectra accumulated</p>
+<p>A single spectrum consists of an accumulation of some number of raw spectra.
+This is written into register <code class="docutils literal notranslate"><span class="pre">acc_len</span></code>.  When this number of raw spectra
+have been accumulated, <code class="docutils literal notranslate"><span class="pre">acc_cnt</span></code> is incremented.</p>
+<p>The spectrometer does not stop running and <code class="docutils literal notranslate"><span class="pre">acc_cnt</span></code> will keep on
+incrementing until the spectrometer is reset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_adc_temp">
+<code class="sig-name descname">get_adc_temp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_adc_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the adc temp</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ambient_temp">
+<code class="sig-name descname">get_ambient_temp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_ambient_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ambient ADC temp</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_clk">
+<code class="sig-name descname">get_clk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_clk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an estimate of the FPGA clock speed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_firmware_keys">
+<code class="sig-name descname">get_firmware_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_firmware_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets (and returns) the names of the firmwares available on this host</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_gains">
+<code class="sig-name descname">get_gains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_gains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the gains of the RF channels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dict of gains[ADC][RF]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum">
+<code class="sig-name descname">get_next_spectrum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>Suggested by Jonathan::</dt><dd><p>acc_new = fpga.read(acc_cnt)
+if acc_new == acc_old</p>
+<blockquote>
+<div><p>do nothing</p>
+</div></blockquote>
+<dl class="simple">
+<dt>else if  acc_new == acc_old + 1</dt><dd><p>read_bram
+acc_old = acc_new</p>
+</dd>
+<dt>else</dt><dd><p>missed an accumulation, throw an error</p>
+</dd>
+</dl>
+<p>end</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up the parameters for the design identified by the key</p>
+<p>Note that is is firmware in dependent in that it just reports on the
+registers of whatever firmware, as long as the firmware is known.</p>
+<p>:param key : name by which the firmware is known</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_spectrum">
+<code class="sig-name descname">get_spectrum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is what read hardware would do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_fpga_uscram</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+  <span class="n">spec</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_fpga_uscram</span><span class="p">(</span><span class="n">sp</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We simulate. We begin with one set of normalized data samples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">normalized</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with a standard deviation of 1. The actual samples are integers in the range
+of -128 to 127, with some standard deviation related to the power:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See <code class="docutils literal notranslate"><span class="pre">Channel.get_ADC_snap()</span></code>.  The central value theorem says that we end
+up with a normal distrubtion about the mean:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span>      <span class="n">max_count</span>  <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mi">24</span> <span class="o">/</span> <span class="n">fft_shift</span>
+<span class="n">spectrum</span><span class="o">.</span><span class="n">std</span>  <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">max_count</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mi">24</span> <span class="o">/</span> <span class="n">fft_shift</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.help">
+<code class="sig-name descname">help</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.initialize_roach">
+<code class="sig-name descname">initialize_roach</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">RF_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">RFid</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">integr_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">timing_report</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.initialize_roach" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises the system to defaults.</p>
+<p>For ROACH2 it will be necessary to loop over RF channels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_get">
+<code class="sig-name descname">integr_time_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the accumulation length.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_set">
+<code class="sig-name descname">integr_time_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">integr_time</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.integr_time_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the accumulation length in seconds</p>
+<p>Each spectrum is taken from <code class="docutils literal notranslate"><span class="pre">num_chan</span></code> samples acquired at a rate of
+<code class="docutils literal notranslate"><span class="pre">bandwidth*1e6</span></code> samples per second. This times <code class="docutils literal notranslate"><span class="pre">integr_time</span></code> is the
+number of raw spectra in one spectrum. This number is written to
+<code class="docutils literal notranslate"><span class="pre">acc_len</span></code>. Once the spectrometer is started, it will collect spectra until
+this number is reached.  Register <code class="docutils literal notranslate"><span class="pre">acc_cnt</span></code> is then incremented.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.quit">
+<code class="sig-name descname">quit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.quit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.read_register">
+<code class="sig-name descname">read_register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">register</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.read_register" title="Permalink to this definition">¶</a></dt>
+<dd><p>To allow a client to read register</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.sync_start">
+<code class="sig-name descname">sync_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.sync_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initiate the sync pulses</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html"
+                        title="previous chapter">SAObackend</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html"
+                        title="next chapter">SAOspecServer</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html" title="SAOspecServer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html" title="SAObackend"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SAOfwif</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

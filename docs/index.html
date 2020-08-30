@@ -70,11 +70,11 @@ To achieve this there are three base superclasses.</p>
 <p>Each of the clients in the previous figure is a subclass of <code class="docutils literal notranslate"><span class="pre">Device</span></code> which
 operates on one or more <code class="docutils literal notranslate"><span class="pre">Signal</span></code>objects that enter and leave <em>via</em>
 <code class="docutils literal notranslate"><span class="pre">Port</span></code> objects.</p>
-</div>
 <div class="section" id="note">
-<h1>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h1>
+<h2>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h2>
 <p>These packages are still in a preliminary state.  The original code was very
 specific to the DSN context.  The conversion will proceed subsystem by susbsystem.</p>
+</div>
 </div>
 <div class="section" id="base-class-modules">
 <h1>Base Class Modules<a class="headerlink" href="#base-class-modules" title="Permalink to this headline">¶</a></h1>
@@ -395,6 +395,9 @@ this assignment:</p>
 </div>
 <div class="section" id="context-modules">
 <h1>Context Modules<a class="headerlink" href="#context-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="antenna">
+<h2>Antenna<a class="headerlink" href="#antenna" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-MonitorControl.Antenna.DSN">
 <span id="monitorcontrol-antenna-dsn-package"></span><h2>MonitorControl.Antenna.DSN Package<a class="headerlink" href="#module-MonitorControl.Antenna.DSN" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id11">
@@ -425,11 +428,38 @@ this assignment:</p>
 <area shape="rect" id="node8" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="183,79,255,104"/>
 </map></div>
 </div>
+<div class="section" id="module-MonitorControl.Antenna.DSN.simulator">
+<span id="monitorcontrol-antenna-dsn-simulator-package"></span><h2>MonitorControl.Antenna.DSN.simulator Package<a class="headerlink" href="#module-MonitorControl.Antenna.DSN.simulator" title="Permalink to this headline">¶</a></h2>
+<p>Provides a class to act a bit like an NMC</p>
+<div class="section" id="id13">
+<h3>Classes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Antenna.DSN.simulator.FakeAntenna.html#MonitorControl.Antenna.DSN.simulator.FakeAntenna" title="MonitorControl.Antenna.DSN.simulator.FakeAntenna"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FakeAntenna</span></code></a>([site, dss])</p></td>
+<td><p>antenna simulator</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id14">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-4754aa162a4a50fc111370cd482906c9bba4c220.png" alt="Inheritance diagram of MonitorControl.Antenna.DSN.simulator.FakeAntenna" usemap="#inheritancefdeaf97640" class="inheritance graphviz" /></div>
+<map id="inheritancefdeaf97640" name="inheritancefdeaf97640">
+<area shape="rect" id="node1" href="api/MonitorControl.Antenna.DSN.simulator.FakeAntenna.html#MonitorControl.Antenna.DSN.simulator.FakeAntenna" target="_top" title="antenna simulator" alt="" coords="5,5,112,31"/>
+</map></div>
+</div>
+<div class="section" id="front-ends">
+<h2>Front Ends<a class="headerlink" href="#front-ends" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-MonitorControl.FrontEnds.DSN">
 <span id="monitorcontrol-frontends-dsn-package"></span><h2>MonitorControl.FrontEnds.DSN Package<a class="headerlink" href="#module-MonitorControl.FrontEnds.DSN" title="Permalink to this headline">¶</a></h2>
 <p>Descriptions of DSN front ends without monitor and control functions</p>
-<div class="section" id="id13">
-<h3>Classes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Classes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -442,8 +472,8 @@ this assignment:</p>
 </tbody>
 </table>
 </div>
-<div class="section" id="id14">
-<h3>Class Inheritance Diagram<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <div class="graphviz"><img src="_images/inheritance-b4026cdb4ff13c5cdc9e943f53af5693d4f6b969.png" alt="Inheritance diagram of MonitorControl.FrontEnds.DSN.DSN_fe" usemap="#inheritancefaff27062c" class="inheritance graphviz" /></div>
 <map id="inheritancefaff27062c" name="inheritancefaff27062c">
 <area shape="rect" id="node1" href="api/MonitorControl.FrontEnds.DSN.DSN_fe.html#MonitorControl.FrontEnds.DSN.DSN_fe" target="_top" title="Class for DSN front ends with no M&amp;C functions" alt="" coords="252,5,324,31"/>
@@ -491,8 +521,8 @@ K-band front end using a LabJack</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="id15">
-<h3>Classes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id17">
+<h3>Classes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -523,8 +553,8 @@ K-band front end using a LabJack</p>
 </tbody>
 </table>
 </div>
-<div class="section" id="id16">
-<h3>Class Inheritance Diagram<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <div class="graphviz"><img src="_images/inheritance-192b39cb45d348c0f7cecedfc75b3dc79e87f977.png" alt="Inheritance diagram of MonitorControl.FrontEnds.K_band.K_4ch" usemap="#inheritance2d5a0267e8" class="inheritance graphviz" /></div>
 <map id="inheritance2d5a0267e8" name="inheritance2d5a0267e8">
 <area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
@@ -532,11 +562,14 @@ K-band front end using a LabJack</p>
 <area shape="rect" id="node3" href="api/MonitorControl.FrontEnds.K_band.K_4ch.html#MonitorControl.FrontEnds.K_band.K_4ch" target="_top" title="The 4&#45;channel downconverter with four inputs for two pols and two feeds." alt="" coords="252,5,324,31"/>
 </map></div>
 </div>
+<div class="section" id="receivers">
+<h2>Receivers<a class="headerlink" href="#receivers" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-MonitorControl.Receivers.DSN">
 <span id="monitorcontrol-receivers-dsn-package"></span><h2>MonitorControl.Receivers.DSN Package<a class="headerlink" href="#module-MonitorControl.Receivers.DSN" title="Permalink to this headline">¶</a></h2>
 <p>DSN receiver descriptions with no monitor and control functions</p>
-<div class="section" id="id17">
-<h3>Classes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h3>Classes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -549,8 +582,8 @@ K-band front end using a LabJack</p>
 </tbody>
 </table>
 </div>
-<div class="section" id="id18">
-<h3>Class Inheritance Diagram<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id20">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <div class="graphviz"><img src="_images/inheritance-4405d833c6c541a6b95feee5ecf73b4936de5d7f.png" alt="Inheritance diagram of MonitorControl.Receivers.DSN.DSN_rx" usemap="#inheritancec02e5ff0f6" class="inheritance graphviz" /></div>
 <map id="inheritancec02e5ff0f6" name="inheritancec02e5ff0f6">
 <area shape="rect" id="node1" href="api/MonitorControl.Receivers.DSN.DSN_rx.html#MonitorControl.Receivers.DSN.DSN_rx" target="_top" title="Class for DSN receivers with no M&amp;C functions" alt="" coords="252,5,324,31"/>
@@ -589,8 +622,8 @@ hybrid to convert them to an upper and lower sideband pair.</p>
 <p>WARNING!  RFsection method _rename_beam is very dependent on the naming
 convention used, specifically, the length of the names.</p>
 </div>
-<div class="section" id="id19">
-<h3>Classes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id21">
+<h3>Classes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -627,8 +660,8 @@ convention used, specifically, the length of the names.</p>
 </tbody>
 </table>
 </div>
-<div class="section" id="id20">
-<h3>Class Inheritance Diagram<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id22">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <div class="graphviz"><img src="_images/inheritance-3c68fa9894b908efef7a72153e3174a8f3789010.png" alt="Inheritance diagram of MonitorControl.Receivers.WBDC.WBDC_base" usemap="#inheritance18faae2bea" class="inheritance graphviz" /></div>
 <map id="inheritance18faae2bea" name="inheritance18faae2bea">
 <area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
@@ -636,10 +669,13 @@ convention used, specifically, the length of the names.</p>
 <area shape="rect" id="node3" href="api/MonitorControl.Receivers.WBDC.WBDC_base.html#MonitorControl.Receivers.WBDC.WBDC_base" target="_top" title="Base class for a DSN K&#45;band wideband down&#45;converter::" alt="" coords="252,5,353,31"/>
 </map></div>
 </div>
+<div class="section" id="back-ends">
+<h2>Back Ends<a class="headerlink" href="#back-ends" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-MonitorControl.BackEnds.DSN">
 <span id="monitorcontrol-backends-dsn-package"></span><h2>MonitorControl.BackEnds.DSN Package<a class="headerlink" href="#module-MonitorControl.BackEnds.DSN" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id21">
-<h3>Classes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id23">
+<h3>Classes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -652,8 +688,8 @@ convention used, specifically, the length of the names.</p>
 </tbody>
 </table>
 </div>
-<div class="section" id="id22">
-<h3>Class Inheritance Diagram<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id24">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <div class="graphviz"><img src="_images/inheritance-b913c43a3166356a145da1c31bdb4ebe44e028a7.png" alt="Inheritance diagram of MonitorControl.BackEnds.DSN.WVSRbackend" usemap="#inheritance283271efa1" class="inheritance graphviz" /></div>
 <map id="inheritance283271efa1" name="inheritance283271efa1">
 <area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="125,5,204,31"/>
@@ -663,8 +699,8 @@ convention used, specifically, the length of the names.</p>
 </div>
 <div class="section" id="module-MonitorControl.BackEnds.ROACH1">
 <span id="monitorcontrol-backends-roach1-package"></span><h2>MonitorControl.BackEnds.ROACH1 Package<a class="headerlink" href="#module-MonitorControl.BackEnds.ROACH1" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id23">
-<h3>Functions<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id25">
+<h3>Functions<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -680,6 +716,170 @@ convention used, specifically, the length of the names.</p>
 </tbody>
 </table>
 </div>
+</div>
+<div class="section" id="module-MonitorControl.BackEnds.ROACH1.SAOclient">
+<span id="monitorcontrol-backends-roach1-saoclient-module"></span><h2>MonitorControl.BackEnds.ROACH1.SAOclient Module<a class="headerlink" href="#module-MonitorControl.BackEnds.ROACH1.SAOclient" title="Permalink to this headline">¶</a></h2>
+<p>Python support for ROACH1 firmware</p>
+<div class="section" id="id26">
+<h3>Classes<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionThread</span></code></p></td>
+<td><p>alias of <a class="reference internal" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.DeviceReadThread</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backend</span></code>(name[, inputs, output_names, …])</p></td>
+<td><p>Defines the Backend class, some assembly of DSP hardware.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.html#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOclient</span></code></a>(name[, inputs, output_names, hardware])</p></td>
+<td><p>SAO 32K-channel spectrometer</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id27">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-78fbaca8bb893740ce86a29587ee1983c99bcd62.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" usemap="#inheritanceaa15f8ce27" class="inheritance graphviz" /></div>
+<map id="inheritanceaa15f8ce27" name="inheritanceaa15f8ce27">
+<area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.html#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" target="_top" title="SAO 32K&#45;channel spectrometer" alt="" coords="252,5,337,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+</map></div>
+</div>
+<div class="section" id="module-MonitorControl.BackEnds.ROACH1.simulator">
+<span id="monitorcontrol-backends-roach1-simulator-module"></span><h2>MonitorControl.BackEnds.ROACH1.simulator Module<a class="headerlink" href="#module-MonitorControl.BackEnds.ROACH1.simulator" title="Permalink to this headline">¶</a></h2>
+<p>This simulates a multi-ROACH backend using the TAMS firmare.</p>
+<p>The basic program behavior is to create a ‘SAObackend’ object.  This is the
+parent for ‘SAOfwif’ (SAO firmware interface) objects, one for each ROACH. The
+‘SAOfwif’ class is a subclass of the ‘DeviceReadThread’ class.</p>
+<p>Each ‘SAOfwif’ object has one or more ‘Channel’ objects (one for ROACH1, four
+for ROACH2) which convert IF signals into 32K power spectra.</p>
+<p>Because conversion to 4-channel firmware is pending, a number of ‘SAOfwif’
+methods should be eventually converted to ‘SAOfwif.Channel’ methods.</p>
+<p>Each ‘SAOfwif’ object initializes its channel(s) and simulates the ROACH’s
+firmware initialization which consists of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">FFT</span> <span class="n">shift</span> <span class="n">register</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">gain</span> <span class="n">of</span> <span class="n">the</span> <span class="n">RF</span> <span class="n">sections</span> <span class="n">of</span> <span class="n">the</span> <span class="n">ADC</span> <span class="n">channels</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="p">(</span><span class="n">integration</span><span class="p">)</span> <span class="n">time</span> <span class="k">as</span> <span class="n">a</span> <span class="n">number</span> <span class="n">of</span> <span class="n">accumulations</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">configures</span> <span class="n">the</span> <span class="n">firmware</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">starts</span> <span class="n">the</span> <span class="n">thread</span><span class="p">,</span> <span class="n">providing</span> <span class="n">it</span> <span class="k">with</span> <span class="n">an</span> <span class="s1">&#39;action&#39;</span> <span class="n">method</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">immediately</span> <span class="n">suspends</span> <span class="n">the</span> <span class="n">thread</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">sets</span> <span class="n">the</span> <span class="n">scan</span> <span class="n">number</span> <span class="n">to</span> <span class="mf">1.</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The ‘SAObackend’ method ‘start’ is invoked by a client. For each ROACH it::</dt><dd><ul class="simple">
+<li><p>resumes the thread,</p></li>
+<li><p>invokes the client’s callback handler to provide the start time,</p></li>
+<li><p>sets the accumulation time to zero.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The ‘SAOfwif’ method ‘action’ increments the number of accumulations and
+checks to see if it exceeds exceeds the specified number of accumulations for
+a scan.  If not it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">waits</span> <span class="k">for</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="n">to</span> <span class="n">be</span> <span class="n">completed</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">invokes</span> <span class="n">the</span> <span class="n">callback</span> <span class="n">to</span> <span class="n">tell</span> <span class="n">the</span> <span class="n">client</span> <span class="n">that</span> <span class="n">a</span> <span class="n">new</span> <span class="n">accumulation</span> <span class="ow">is</span> <span class="n">done</span>
+<span class="o">*</span> <span class="n">writes</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="p">(</span><span class="n">spectrum</span><span class="p">)</span> <span class="n">to</span> <span class="n">the</span> <span class="n">datafile</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>If the number of accumulations exceeds the specified maximum it::</dt><dd><ul class="simple">
+<li><p>invokes the callback to say that a scan is finished,</p></li>
+<li><p>suspends the threat,</p></li>
+<li><p>sets the number of accumulations to 0,</p></li>
+<li><p>increments the scan number.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note therefore that a ‘scan’ consists of some specified number of accumulations
+(integrations) each of which is written as a record, that is, as a row in a 2D
+numpy array.  It is the job of the client to start a new scan which resumes the
+thread.</p>
+<p><em>Scan and Record Numbers</em></p>
+<p>Scan and record numbers are both three digit strings starting with ‘000’. These
+are used as names for the groups in the HDF5 hierarchy.  Each ROACH has its own
+copy of the scan number. Record numbers are initialized to 0 when the SAOfwif
+object is created.  The scan numbers are updated in the SAObackend action()
+method when a scan is completed. (It’s better to think of action() as a method
+which the SAOfwif parent provides.)</p>
+<p><em>Metadata</em></p>
+<p>The SAOfwif object creates an HDF5 file when it is initialised. The firmware
+register data which do not change are attrs of the top level of the HDF5
+hierarchy. The SAObackend method ‘start(N)’ will start a new scan of N records
+for each ROACH. Scans are at the second level of the HDF5 hierarchy. The attrs
+of the scan level of the file are those firmware registers which do not change
+during a scan. Each record is written to disk as it is acquired. The attrs of
+the record level are the register values which change all the time, and also
+‘time’ in seconds.</p>
+<p class="rubric">Example</p>
+<p>from MonitorControl.BackEnds.ROACH1.SAOfwif import SAObackend
+be = SAObackend(“SAO spectrometer”,</p>
+<blockquote>
+<div><p>roachlist=[“sao64k-1”, “sao64k-2”, “sao64k-3”, “sao64k-4”])</p>
+</div></blockquote>
+<p>roach = {}
+outfile = {}
+current_scan = be.roach[“sao64k-4”].scan
+for key in [1,2,3,4]:</p>
+<blockquote>
+<div><p>outfile[key] = open(“/var/tmp/sao64k-“+str(key)+”.txt”, “w”)
+roach[key] = be.roach[‘sao64k-‘+str(key)]
+roach[key].start_recording(acc_time=5)
+roach[key].resume_thread()</p>
+</div></blockquote>
+<div class="section" id="id28">
+<h3>Functions<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html#MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser" title="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_arg_parser</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.main.html#MonitorControl.BackEnds.ROACH1.simulator.main" title="MonitorControl.BackEnds.ROACH1.simulator.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>(server_cls)</p></td>
+<td><p>starts logging, creates a server_cls object, launches the server object</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id29">
+<h3>Classes<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAObackend</span></code></a>(name[, roaches, roachlist, …])</p></td>
+<td><p>A simulated multi-ROACH 32k-channel x 4-IF spectrometer</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOfwif</span></code></a>([parent, roach, template, …])</p></td>
+<td><p>Class for one ROACH with SAO 32K spectrometer firmware</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" title="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOspecServer</span></code></a>(name[, roachlist, logpath, …])</p></td>
+<td><p>Pyro server for the SAO back end</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id30">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<div class="graphviz"><img src="_images/inheritance-126d39edef2d49dae8e40ee53d8ddf74ca8adee3.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.simulator.SAObackend, MonitorControl.BackEnds.ROACH1.simulator.SAOfwif, MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" usemap="#inheritancece3b90ffc7" class="inheritance graphviz" /></div>
+<map id="inheritancece3b90ffc7" name="inheritancece3b90ffc7">
+<area shape="rect" id="node1" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="157,104,301,129"/>
+<area shape="rect" id="node7" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" target="_top" title="Class for one ROACH with SAO 32K spectrometer firmware" alt="" coords="364,104,439,129"/>
+<area shape="rect" id="node6" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" target="_top" title="A simulated multi&#45;ROACH 32k&#45;channel x 4&#45;IF spectrometer" alt="" coords="349,5,453,31"/>
+<area shape="rect" id="node8" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" target="_top" title="Pyro server for the SAO back end" alt="" coords="501,31,623,56"/>
+</map></div>
+</div>
+<div class="section" id="configurations">
+<h2>Configurations<a class="headerlink" href="#configurations" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-MonitorControl.Configurations.CDSCC">
 <span id="monitorcontrol-configurations-cdscc-package"></span><h2>MonitorControl.Configurations.CDSCC Package<a class="headerlink" href="#module-MonitorControl.Configurations.CDSCC" title="Permalink to this headline">¶</a></h2>
@@ -711,8 +911,8 @@ Out[8]: 0.8146366203374346
 In [9]: beam_efficiency(4.603259726615511e-07,3.5247890878359627e-07)
 Out[9]: 0.7657158833458915</p>
 </div>
-<div class="section" id="id24">
-<h3>Functions<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id31">
+<h3>Functions<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -757,8 +957,8 @@ number. If there is no key, that IF does not exist.</p>
 </dl>
 </dd>
 </dl>
-<div class="section" id="id25">
-<h3>Functions<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id32">
+<h3>Functions<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -795,8 +995,10 @@ number. If there is no key, that IF does not exist.</p>
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Single Dish Radio Astronomy Software Tools</a></li>
-<li><a class="reference internal" href="#general-purpose-radio-telescope-monitor-and-control">General Purpose Radio Telescope Monitor and Control</a></li>
+<li><a class="reference internal" href="#general-purpose-radio-telescope-monitor-and-control">General Purpose Radio Telescope Monitor and Control</a><ul>
 <li><a class="reference internal" href="#note">Note</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#base-class-modules">Base Class Modules</a><ul>
 <li><a class="reference internal" href="#module-MonitorControl">MonitorControl Package</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a></li>
@@ -832,25 +1034,33 @@ number. If there is no key, that IF does not exist.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#context-modules">Context Modules</a><ul>
+<li><a class="reference internal" href="#antenna">Antenna</a></li>
 <li><a class="reference internal" href="#module-MonitorControl.Antenna.DSN">MonitorControl.Antenna.DSN Package</a><ul>
 <li><a class="reference internal" href="#id11">Classes</a></li>
 <li><a class="reference internal" href="#id12">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-MonitorControl.FrontEnds.DSN">MonitorControl.FrontEnds.DSN Package</a><ul>
+<li><a class="reference internal" href="#module-MonitorControl.Antenna.DSN.simulator">MonitorControl.Antenna.DSN.simulator Package</a><ul>
 <li><a class="reference internal" href="#id13">Classes</a></li>
 <li><a class="reference internal" href="#id14">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-MonitorControl.FrontEnds.K_band">MonitorControl.FrontEnds.K_band Package</a><ul>
-<li><a class="reference internal" href="#signals">Signals</a></li>
+<li><a class="reference internal" href="#front-ends">Front Ends</a></li>
+<li><a class="reference internal" href="#module-MonitorControl.FrontEnds.DSN">MonitorControl.FrontEnds.DSN Package</a><ul>
 <li><a class="reference internal" href="#id15">Classes</a></li>
 <li><a class="reference internal" href="#id16">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-MonitorControl.Receivers.DSN">MonitorControl.Receivers.DSN Package</a><ul>
+<li><a class="reference internal" href="#module-MonitorControl.FrontEnds.K_band">MonitorControl.FrontEnds.K_band Package</a><ul>
+<li><a class="reference internal" href="#signals">Signals</a></li>
 <li><a class="reference internal" href="#id17">Classes</a></li>
 <li><a class="reference internal" href="#id18">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#receivers">Receivers</a></li>
+<li><a class="reference internal" href="#module-MonitorControl.Receivers.DSN">MonitorControl.Receivers.DSN Package</a><ul>
+<li><a class="reference internal" href="#id19">Classes</a></li>
+<li><a class="reference internal" href="#id20">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-MonitorControl.Receivers.WBDC">MonitorControl.Receivers.WBDC Package</a><ul>
@@ -858,26 +1068,39 @@ number. If there is no key, that IF does not exist.</p>
 <li><a class="reference internal" href="#input-switching">Input Switching</a></li>
 <li><a class="reference internal" href="#polarization-conversion">Polarization Conversion</a></li>
 <li><a class="reference internal" href="#sideband-separation">Sideband Separation</a></li>
-<li><a class="reference internal" href="#id19">Classes</a></li>
-<li><a class="reference internal" href="#id20">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-MonitorControl.BackEnds.DSN">MonitorControl.BackEnds.DSN Package</a><ul>
 <li><a class="reference internal" href="#id21">Classes</a></li>
 <li><a class="reference internal" href="#id22">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-MonitorControl.BackEnds.ROACH1">MonitorControl.BackEnds.ROACH1 Package</a><ul>
-<li><a class="reference internal" href="#id23">Functions</a></li>
+<li><a class="reference internal" href="#back-ends">Back Ends</a></li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds.DSN">MonitorControl.BackEnds.DSN Package</a><ul>
+<li><a class="reference internal" href="#id23">Classes</a></li>
+<li><a class="reference internal" href="#id24">Class Inheritance Diagram</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds.ROACH1">MonitorControl.BackEnds.ROACH1 Package</a><ul>
+<li><a class="reference internal" href="#id25">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds.ROACH1.SAOclient">MonitorControl.BackEnds.ROACH1.SAOclient Module</a><ul>
+<li><a class="reference internal" href="#id26">Classes</a></li>
+<li><a class="reference internal" href="#id27">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-MonitorControl.BackEnds.ROACH1.simulator">MonitorControl.BackEnds.ROACH1.simulator Module</a><ul>
+<li><a class="reference internal" href="#id28">Functions</a></li>
+<li><a class="reference internal" href="#id29">Classes</a></li>
+<li><a class="reference internal" href="#id30">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configurations">Configurations</a></li>
 <li><a class="reference internal" href="#module-MonitorControl.Configurations.CDSCC">MonitorControl.Configurations.CDSCC Package</a><ul>
 <li><a class="reference internal" href="#notes-on-beam-efficiency">Notes on beam efficiency</a></li>
-<li><a class="reference internal" href="#id24">Functions</a></li>
+<li><a class="reference internal" href="#id31">Functions</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-MonitorControl.Configurations.GDSCC">MonitorControl.Configurations.GDSCC Package</a><ul>
-<li><a class="reference internal" href="#id25">Functions</a><ul>
+<li><a class="reference internal" href="#id32">Functions</a><ul>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,10 @@
+<map id="inheritancece3b90ffc7" name="inheritancece3b90ffc7">
+<area shape="rect" id="node1" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="157,104,301,129"/>
+<area shape="rect" id="node7" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" target="_top" title="Class for one ROACH with SAO 32K spectrometer firmware" alt="" coords="364,104,439,129"/>
+<area shape="rect" id="node2" title="A class that represents a thread of control." alt="" coords="21,104,93,129"/>
+<area shape="rect" id="node3" title="A base class enhanced with methods for reporting self." alt="" coords="5,5,109,31"/>
+<area shape="rect" id="node4" title="A subclass of MCobject enhanced with properties." alt="" coords="167,5,291,31"/>
+<area shape="rect" id="node6" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" target="_top" title="A simulated multi&#45;ROACH 32k&#45;channel x 4&#45;IF spectrometer" alt="" coords="349,5,453,31"/>
+<area shape="rect" id="node5" title="class that can launch an object or instance of class on a nameserver or" alt="" coords="351,55,452,80"/>
+<area shape="rect" id="node8" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" target="_top" title="Pyro server for the SAO back end" alt="" coords="501,31,623,56"/>
+</map>

@@ -42,7 +42,7 @@ operates on one or more ``Signal``\ objects that enter and leave *via*
 ``Port`` objects.
 
 Note
-====
+----
 These packages are still in a preliminary state.  The original code was very 
 specific to the DSN context.  The conversion will proceed subsystem by susbsystem.
 
@@ -61,13 +61,30 @@ These modules are all part of the base ``MonitorControl`` package.
 
 Context Modules
 ===============
+Antenna
+-------
 .. automodapi:: MonitorControl.Antenna.DSN
+.. automodapi:: MonitorControl.Antenna.DSN.simulator
+
+Front Ends
+----------
 .. automodapi:: MonitorControl.FrontEnds.DSN
 .. automodapi:: MonitorControl.FrontEnds.K_band
+
+Receivers
+---------
 .. automodapi:: MonitorControl.Receivers.DSN
 .. automodapi:: MonitorControl.Receivers.WBDC
+
+Back Ends
+---------
 .. automodapi:: MonitorControl.BackEnds.DSN
 .. automodapi:: MonitorControl.BackEnds.ROACH1
+.. automodapi:: MonitorControl.BackEnds.ROACH1.SAOclient
+.. automodapi:: MonitorControl.BackEnds.ROACH1.simulator
+
+Configurations
+--------------
 .. automodapi:: MonitorControl.Configurations.CDSCC
 .. automodapi:: MonitorControl.Configurations.GDSCC
 
