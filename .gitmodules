@@ -7,3 +7,6 @@
 [submodule "FrontEnds/K_band"]
 	path = FrontEnds/K_band
 	url = git@github.com:SDRAST/FrontEnds_K_band.git
+[submodule "BackEnds/ROACH1"]
+	path = BackEnds/ROACH1
+	url = git@github.com:SDRAST/BackEnds_ROACH1.git
