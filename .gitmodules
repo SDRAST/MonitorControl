@@ -10,3 +10,6 @@
 [submodule "BackEnds/ROACH1"]
 	path = BackEnds/ROACH1
 	url = git@github.com:SDRAST/BackEnds_ROACH1.git
+[submodule "FrontEnds/DSN"]
+	path = FrontEnds/DSN
+	url = git@github.com:SDRAST/FrontEnds_DSN.git
