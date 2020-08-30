@@ -16,3 +16,6 @@
 [submodule "Receivers/DSN"]
 	path = Receivers/DSN
 	url = git@github.com:SDRAST/Receivers_DSN.git
+[submodule "Receivers/WBDC"]
+	path = Receivers/WBDC
+	url = git@github.com:SDRAST/Receivers_WBDC.git
