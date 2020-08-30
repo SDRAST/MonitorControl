@@ -22,3 +22,6 @@
 [submodule "Configurations/CDSCC"]
 	path = Configurations/CDSCC
 	url = git@github.com:SDRAST/Configurations_CDSCC.git
+[submodule "Configurations/GDSCC"]
+	path = Configurations/GDSCC
+	url = git@github.com:SDRAST/Configurations_GDSCC.git
