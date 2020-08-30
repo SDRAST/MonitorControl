@@ -34,7 +34,7 @@ Communication between clients and their servers uses the ``Pyro5`` module.
 The central server keeps track of what happens to a signal as it enters the
 telescope (antenna) and progresses to its final digital format for analysis.
 To achieve this there are three base superclasses.
-.. image:: baseclasses.png
+.. image:: baseClasses.png
 Each of the clients in the previous figure is a subclass of ``Device`` which
 operates on one or more ``Signal``\ objects that enter and leave *via*
 ``Port`` objects.
