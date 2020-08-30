@@ -1,3 +1,6 @@
 [submodule "Antenna/DSN"]
 	path = Antenna/DSN
 	url = git@github.com:SDRAST/Antenna_DSN.git
+[submodule "BackEnds/DSN"]
+	path = BackEnds/DSN
+	url = git@github.com:SDRAST/BackEnds_DSN.git
