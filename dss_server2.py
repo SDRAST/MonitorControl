@@ -85,8 +85,7 @@ Example of session to test the server::
    'Receiver': WBDC2 "WBDC-2"}
 
 """
-from gevent import monkey
-monkey.patch_all()
+
 
 import astropy
 import astropy.io.fits as pyfits
@@ -108,53 +107,51 @@ import Pyro5
 import queue
 import time
 import socket
-#import threading
+import threading
 import signal
 import six
 
 from Pyro5.serializers import SerializerBase
 
+mpl_logger = logging.getLogger('matplotlib')
+mpl_logger.setLevel(logging.WARNING)
+module_logger = logging.getLogger(__name__)
+
 import Astronomy as A
 from Astronomy.Ephem import SerializableBody
 from Astronomy.redshift import V_LSR
-from Automation import activity_project, get_auto_project, projects_dir
-from Automation import get_activity, get_projects, get_real_project
-from Data_Reduction import get_num_chans, reduce_spectrum_channels
+import Data_Reduction.boresights.boresight_manager as BSM
+import Data_Reduction.boresights.analyzer as BSA
 from Data_Reduction.FITS.DSNFITS import FITSfile
 from DatesTimes import UnixTime_to_datetime
-from MonitorControl import ActionThread, ObservatoryError
-from MonitorControl.apps.server.DSS_server_cfg import tams_config # not really TAMS
+from MonitorControl import ActionThread, MonitorControlError
+from MonitorControl.DSS_server_cfg import tams_config # not really TAMS
 from MonitorControl.Configurations  import station_configuration
 from MonitorControl.Configurations.GDSCC.WVSR  import station_configuration as std_configuration
+import MonitorControl.Configurations.projects as projects
 from MonitorControl.Receivers.DSN import DSN_rx
 from Physics.Radiation.Lines.recomb_lines import recomb_freq
 from Radio_Astronomy.bands import frequency_to_band
 from support import hdf5_util
+from support.local_dirs import projects_dir 
 from support.logs import setup_logging
 from support.pyro.pyro5_server import Pyro5Server
 from support.pyro.socket_error import register_socket_error
 from support.test import auto_test
 from support.text import make_title
 
-from local_dirs import act_proj_path, projects_dir
+from local_dirs import proj_conf_path, projects_dir
+
+#from MonitorControl.Configurations.CDSCC.FO_patching import module_logger as patchlogger
+#patchlogger.setLevel(logging.WARNING)
 
 # this is needed so it looks like a package even when it is run as a program
 if __name__ == "__main__" and __package__ is None:
-    __package__ = "MonitorControl.apps.server"
-
-from . import util
-from ..postproc import (
-    SingleAxisBoresightDataAnalyzer,
-    BoresightFileAnalyzer
-)
-
-from ..postproc.manager import BoresightManager
+    __package__ = "MonitorControl"
 
 __all__ = ["DSSServer"]
 
 register_socket_error()
-
-module_logger = logging.getLogger(__name__)
 
 # temporary; need to construct from project, dss, and band
 configs = {
@@ -179,7 +176,7 @@ veldef = 'RADI-OBS'
 equinox = 2000
 restfreq = 22235.120 # H2O maser, MHz
 
-@config.expose
+@Pyro5.api.expose
 class DSSServer(Pyro5Server):
     """
     Server that integrates functionality from a DSS station's hardware configuration.
@@ -357,8 +354,9 @@ class DSSServer(Pyro5Server):
       "catalog-attention", "catalog-done",
       "catalog-far", "catalog-intermediate", "catalog-near",
       "known-HII", "known-line-source", "known-maser"]
+      
     def __init__(self, context,        # required
-                       project_or_activity="TAMS",
+                       project="TAMS",
                        import_path=None,
                        config_args=None,
                        config_kwargs=None,
@@ -379,25 +377,13 @@ class DSSServer(Pyro5Server):
         """
         super(DSSServer, self).__init__(obj=self, **kwargs)
 
-        if project_or_activity in get_activity():
-          # get the activity's associated project
-          project = activity_project(project_or_activity)
-        elif project_or_activity in get_projects():
-          # get the AUTO project's real project name
-          project = get_real_project(project_or_activity)
-        else:
-          # check that it's really a project
-          with open(projects_dir+"project_names.json", "r") as f:
-            prjs = json.load(f)
-          if not project_or_activity in prjs:
-            self.logger.error("__init__: %s not recognized", project_or_activity)
-            raise RuntimeError("invalid project or activity")
-          else:
-            project = project_or_activity
-
+        if project not in projects.get_projects():
+          self.logger.error("__init__: %s not recognized", project)
+          raise RuntimeError("%s is invalid projecty" % project)
+        self.logger.debug("__init__: project is %s", project)
         # get a dict with context names and paths to their configurations
         self.configs = self.get_configs()
-
+        self.logger.debug("__init__: configurations: %s", self.configs)
         # allow for non-standard configurations; needed even without hardware
         # this creates attributes:
         #    observatory
@@ -421,27 +407,30 @@ class DSSServer(Pyro5Server):
         self.receiver = self.equipment['Receiver']
         self.patchpanel = self.equipment['IF_switch']
         self.backend = self.equipment['Backend']
+        self.logger.debug("__init__: backend is %s", self.backend)
         self.roachnames = self.backend.roachnames
         # initialize a FITS file
         self.initialize_FITS()
         # keep track of scans received
         self.scans = [] # don't confuse with self.backend.scans
         # telescope location
+        self.logger.debug("__init__: empty scans file created")
         longitude = -self.telescope.long*180/math.pi # east logitude
         latitude = self.telescope.lat*180/math.pi
         height = self.telescope.elevation
         self.location = astropy.coordinates.EarthLocation(lon=longitude,
                                                           lat=latitude,
                                                           height=height)
+        self.logger.debug("__init__: telescope location defined")
         # signal properties
         self.get_signals()
         # observing mode
         self.obsmode = obsmode
         self.restfreq = restfreq
         # JSON file on client host
-        self.last_spectra_file = "/var/tmp/last_spectrum.json"
+        #self.last_spectra_file = "/var/tmp/last_spectrum.json"
         #self.backend.init_disk_monitors()
-        self.backend.observer.start()
+        #self.backend.observer.start() <<<<<<<<<<<<<< not working; maybe not needed
         self.logger.debug("__init__: done")
 
     def initialize_FITS(self):
@@ -454,10 +443,12 @@ class DSSServer(Pyro5Server):
         # initialize a SDFITS binary table
         # default to SAO configuration
         # 32768 ch, one position, two pols, 60 integrations, 2 beams
-        self.dims = [32768,1,1,2,100,2]
+        self.dims = [32768,1,1,2,50,2]
         self.bintabHDU = self.init_binary_table()
+        self.logger.debug("initialize_FITS: empty binary table received")
         self.HDUs.append(self.bintabHDU)
         self.hdulist = pyfits.HDUList(self.HDUs)
+        self.logger.debug("initialize_FITS: HDU list created")
         self.filename = "/var/tmp/test-"+str(time.time())+".fits"
         self.FITSqueue = queue.Queue()
         self.FITSwriter = ActionThread(self, self.add_data_to_FITS,
@@ -484,12 +475,13 @@ class DSSServer(Pyro5Server):
         nrecs  = self.dims[4]
         nbeams = self.dims[5]
         # adjust for X frontend and receiver
-        self.logger.info("make_SAO_table: receiver is %s", self.equipment['Receiver'])
+        self.logger.info("make_SAO_table: receiver is %s",
+                         self.equipment['Receiver'])
         if type(self.equipment['Receiver']) == DSN_rx:
           nbeams = 1
-          self.logger.debug("make_SAO_table: DSN receivers have one beam")
+          self.logger.debug("init_binary_table: DSN receivers have one beam")
         else:
-          self.logger.debug("make_SAO_table: receiver has %d beams", nbeams)
+          self.logger.debug("init_binary_table: receiver has %d beams", nbeams)
 
         # add the site data
         self.fitsfile.add_site_data(self.fitsfile.exthead)
@@ -498,10 +490,11 @@ class DSSServer(Pyro5Server):
         self.fitsfile.make_basic_columns()
 
         # add the backend data
-        be = self.backend
-        self.fitsfile.exthead['FREQRES'] = be.freqs[-1]/(be.num_chan-1)
-        self.fitsfile.exthead['BANDWIDt'] = be.num_chan*self.fitsfile.exthead['FREQRES']
-        self.fitsfile.get_hardware_metadata(be)
+        freqs = self.backend.freqs
+        num_chan = len(freqs)
+        self.fitsfile.exthead['FREQRES'] = freqs[-1]/(num_chan-1)
+        self.fitsfile.exthead['BANDWIDt'] = num_chan*self.fitsfile.exthead['FREQRES']
+        self.fitsfile.get_hardware_metadata(self.backend)
 
         # add multi-dimensioned metadata
         self.fitsfile.add_time_dependent_columns(nrecs)
@@ -574,11 +567,13 @@ class DSSServer(Pyro5Server):
         self.logger.debug("init_binary_table: data_format = %s", data_format)
         self.fitsfile.columns.add_col(pyfits.Column(name='DATA', format=data_format,
                              dim=dimsval))
-
+        self.logger.debug("init_binary_table: table columns created")
         # create the table extension
         FITSrec = pyfits.FITS_rec.from_columns(self.fitsfile.columns, nrows=numscans)
+        self.logger.debug("init_binary_table: FITS record built")
         tabhdu = pyfits.BinTableHDU(data=FITSrec, header=self.fitsfile.exthead,
                                 name="SINGLE DISH")
+        self.logger.debug("init__binary_table: empty table created")
         # empty table
         return tabhdu
 
@@ -611,14 +606,14 @@ class DSSServer(Pyro5Server):
             "save_FITS: Took {:.3f} seconds to copy FITS data".format(
                 time.time() - t0))
         t0 = time.time()
-        hdulist.writeto(self.filename, overwrite=True)
+        #hdulist.writeto(self.filename, overwrite=True)
         #del savePriHDU
         #del saveRec
         #del saveBinTab
         #del saveHDUs
         #del hdulist
-        self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
-        self.save_FITS.cb({"status": "saved to %s" % self.filename})
+        #self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
+        #self.save_FITS.cb({"status": "saved to %s" % self.filename})
 
     def _config_hw(self, context,
                        import_path=None,
@@ -632,9 +627,11 @@ class DSSServer(Pyro5Server):
         # get the hardware configuration
         if context in self.configs:
           # the usual way to get the configuration, accepting the defaults
+          self.logger.debug("_config_hw: standard configuration")
           observatory, equipment = station_configuration(context, **config_args)
         else:
           # if not a standard configuration, infer from context name like PSR014L
+          self.logger.debug("_config_hw: non-standard configuration")
           activity = context[:4]
           project = self.activitys_project(activity)
           dss = int(context[4:6])
@@ -669,11 +666,11 @@ class DSSServer(Pyro5Server):
         if boresight_manager_file_paths is None:
             # use default location of boresight files
             file_paths, boresight_manager_file_paths = \
-                BoresightManager.detect_file_paths()
+                BSM.BoresightManager.detect_file_paths()
         if boresight_manager_kwargs is None:
             # overriding boresight manager keyword arguments
             boresight_manager_kwargs = {}
-        self.boresight_manager = BoresightManager(
+        self.boresight_manager = BSM.BoresightManager(
             boresight_manager_file_paths,
             **boresight_manager_kwargs
         )
@@ -936,26 +933,28 @@ class DSSServer(Pyro5Server):
         """
         #self.logger.debug("hdwr: {} method '{}' called".format(hdwr, method_name))
         if hdwr not in self.equipment:
-            raise ObservatoryError([], "Couldn't find {} in equipment".format(hdwr))
+            raise MonitorControlError([], "Couldn't find {} in equipment".format(hdwr))
         elif self.equipment[hdwr].hardware == False:
           self.emulate(hdwr, method_name)
         else:
           hdwr_obj = self.equipment[hdwr]
+          self.logger.debug("hdwr: hardware is %s", hdwr_obj)
           try:
               method = getattr(hdwr_obj, method_name)
+              self.logger.debug("hdwr: method is %s", method)
               if callable(method):
                 result = method(*args, **kwargs)
               else:
                 result = method # accessing an attribute
-              #self.logger.debug("hdwr: result: %s", result)
+              self.logger.debug("hdwr: result: %s", result)
               try:
                 self.parse_result(result)
               except Exception as details:
-                raise ObservatoryError([], "parsing {} failed".format(result))
+                raise MonitorControlError([], "parsing {} failed".format(result))
               self.hdwr.cb(result) # send client the result
               return result
           except AttributeError as err:
-            raise ObservatoryError([], "Couldn't find method {} for {}".format(method_name, hdwr))
+            raise MonitorControlError([], "Couldn't find method {} for {}".format(method_name, hdwr))
 
     def emulate(self, hdwr, method_name):
         """
@@ -1712,7 +1711,7 @@ class DSSServer(Pyro5Server):
                        float(src["el"])*convert)
 
             self.logger.error(msg)
-            raise ObservatoryError([], msg)
+            raise MonitorControlError([], msg)
         self.info["point"]["current_source"] = src
         resp = self.hdwr("Antenna", "point_radec", src["_ra"], src["_dec"])
         self.logger.debug("point: resp from Antenna: {}".format(resp))
@@ -1918,7 +1917,7 @@ class DSSServer(Pyro5Server):
         # initialize a BoresightFileAnalyzer object
         file_path = self._create_calibration_file_path(
             boresight_base_data_dir, prefix)
-        analyzer_obj = BoresightFileAnalyzer(
+        analyzer_obj = BSA.BoresightFileAnalyzer(
             file_path=file_path,
             boresight_type="scanning"
         )
@@ -2100,7 +2099,7 @@ class DSSServer(Pyro5Server):
                 scan_dir_str = scan_dir_map[str(scan_dir)]
                 tsys_data_scan_dir = scan_and_collect(axis, scan_dir)
                 analyzer_obj.data[axis.lower()][scan_dir_str] = \
-                    SingleAxisBoresightDataAnalyzer(
+                    BSA.SingleAxisBoresightDataAnalyzer(
                         tsys_data_scan_dir[scan_dir_str]["offset"],
                         tsys_data_scan_dir[scan_dir_str]["tsys"],
                         axis=axis.lower(),
@@ -2364,7 +2363,7 @@ class DSSServer(Pyro5Server):
         file_path = self._create_calibration_file_path(
             boresight_base_data_dir, prefix)
 
-        analyzer_obj = BoresightFileAnalyzer(
+        analyzer_obj = BSA.BoresightFileAnalyzer(
             file_path=file_path,
             boresight_type="stepping"
         )
@@ -2451,7 +2450,7 @@ class DSSServer(Pyro5Server):
                     self.stepping_boresight.cb({'status': msg, "done":True})
                     return
                 analyzer_obj.data[axis_lower][scan_dir_str] = \
-                    SingleAxisBoresightDataAnalyzer(
+                    BSA.SingleAxisBoresightDataAnalyzer(
                         axis_points,
                         avg_tsys,
                         axis=axis_lower,
@@ -2519,7 +2518,7 @@ class DSSServer(Pyro5Server):
         Returns:
             dict:
         """
-        file_paths, flattened = BoresightManager.detect_file_paths(**kwargs)
+        file_paths, flattened = BSM.BoresightManager.detect_file_paths(**kwargs)
         self.get_boresight_file_paths.cb(
             file_paths
         )
@@ -2575,7 +2574,7 @@ class DSSServer(Pyro5Server):
             dict: dictionary representation of file analyzer object.
         """
         self.logger.debug("get_most_recent_boresight_analyzer_object: called")
-        file_paths, flattened = BoresightManager.detect_file_paths()
+        file_paths, flattened = BSM.BoresightManager.detect_file_paths()
         dt_objs = []
         for file_path in flattened:
             file_name = os.path.basename(file_path)
@@ -3048,10 +3047,8 @@ class DSSServer(Pyro5Server):
         while not self.equipment["Backend"].scan_completed:
             time.sleep(0.01)
 
-    @Pyro5.api.oneway
     def start_spec_scans(self, n_scans=1, n_spectra=10, int_time=1,
-                         log_n_avg=4, mid_chan=None, 
-                         callback=self.start_spec_handler):
+                               log_n_avg=4, mid_chan=None):
         """
         This is invoked by the Vue client
 
@@ -3185,8 +3182,10 @@ class DSSServer(Pyro5Server):
         pol_mapping = {"E": 0, "H": 1, "L": 0, "R": 1}
         be = self.backend
         self.logger.debug("get_signals: ROACH names: %s", self.roachnames)
-        self.rx_signals = [be.inputs[be.input_names[roach]].signal.name
-                                          for roach in self.roachnames]
+        input_names = be.inputs.keys()
+        self.logger.debug("get_signals: inputs: %s", input_names)
+        self.rx_signals = [ be.inputs[name].signal.name
+                                                 for name in input_names ]
         self.logger.debug("get_signals: receiver signals: %s", self.rx_signals)
         crossover = self.receiver.crossSwitch.get_state()
         self.fe_signals = []
@@ -3385,7 +3384,6 @@ class DSSServer(Pyro5Server):
         if self.spectra_left == 0:
           self.save_FITS()
 
-    @Pyro5.oneway
     @Pyro5.api.callback
     def start_spec_handler(self, *args):
         """
@@ -3647,7 +3645,7 @@ class DSSServer(Pyro5Server):
       get a list of all the projects
       """
       projects = []
-      for project in get_projects():
+      for project in projects.get_projects():
         projects.append(get_real_project(project))
       projects.sort()
       self.get_projects.cb(projects)
@@ -3658,7 +3656,7 @@ class DSSServer(Pyro5Server):
       """
       get a list of all the activities
       """
-      activities = get_activity()
+      activities = projects.get_activity()
       activities.remove('archive')
       activities.sort()
       self.get_activities.cb(activities)
@@ -3714,7 +3712,7 @@ class DSSServer(Pyro5Server):
       get the project associated with the current activity
       """
       self.logger.debug("get_activitys_project: called for %s", activity)
-      project = activity_project(activity)
+      project = projects.activity_project(activity)
       self.logger.debug("get_activitys_project: project is %s", project)
       self.get_activitys_project.cb(project)
       return project
@@ -3750,36 +3748,35 @@ class DSSServer(Pyro5Server):
       self.get_project_activities.cb(proj_activities)
       return proj_activities
 
-# =============================== module functions ============================
-
-def create_arg_parser():
-    """
-    create an argument parser and define arguments
-    """
-    import argparse
-    parser = argparse.ArgumentParser(description="Fire up DSS control server.")
-    parser.add_argument("--verbose", "-v",
-                        dest="verbose", required=False,
-                        action="store_true", default=True,
-                        help="In verbose mode, the log level is DEBUG; default: False")
-    parser.add_argument("--simulated", "-s",
-                        dest="simulated", required=False,
-                        action="store_true", default=True,
-                        help="In simulated mode, DSS Server won't attempt to "
-                             +"connect to hardware servers. Default: True")
-    parser.add_argument("--flask", "-f",
-                        dest="flask", required=False,
-                        action="store_true", default=True,
-                        help="Run server as flask server; default: True")
-    parser.add_argument("--flaskio", "-fio",
-                        dest="flaskio", required=False,
-                        action="store_true", default=True,
-                        help="Run server as flask io server; default: True")
-    return parser
 
 # ================================= Program ===================================
 
 if __name__ == "__main__":
+    
+    def create_arg_parser():
+      """
+      create an argument parser and define arguments
+      """
+      import argparse
+      parser = argparse.ArgumentParser(description="Fire up DSS control server.")
+      parser.add_argument("--verbose", "-v",
+                        dest="verbose", required=False,
+                        action="store_true", default=True,
+                        help="In verbose mode, the log level is DEBUG; default: False")
+      parser.add_argument("--simulated", "-s",
+                        dest="simulated", required=False,
+                        action="store_true", default=True,
+                        help="In simulated mode, DSS Server won't attempt to "
+                             +"connect to hardware servers. Default: True")
+      parser.add_argument("--flask", "-f",
+                        dest="flask", required=False,
+                        action="store_true", default=True,
+                        help="Run server as flask server; default: True")
+      parser.add_argument("--flaskio", "-fio",
+                        dest="flaskio", required=False,
+                        action="store_true", default=True,
+                        help="Run server as flask io server; default: True")
+      return parser
 
     # parsed is an object with arguments as attributes
     parsed = create_arg_parser().parse_args()
@@ -3815,3 +3812,4 @@ if __name__ == "__main__":
       mylogger.warning("Server terminated at %s",
                        datetime.datetime.utcnow().strftime("%Y-%j-%Hh%Mm%Ss"))
       server.close()
+

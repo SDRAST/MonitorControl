@@ -8,9 +8,16 @@ Single Dish Radio Astronomy Software Tools
 
 For an overview of SDRAST and the current status please visit https://sdrast.github.io/.
 
+General Purpose Radio Telescope
+===============================
+Monitor and Control
+===================
+
 Note
 ====
-These packages are in a very preliminary state and need lots of work.  The original code was very specific to the DSN context.  The conversion will proceed subsystem by susbsystem.
+These packages are still in a preliminary state.  The original code was very specific to the DSN context.  The conversion will proceed subsystem by susbsystem.
+
+
 
 Base Class Modules
 ==================

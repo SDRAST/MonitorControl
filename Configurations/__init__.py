@@ -16,17 +16,17 @@ Attachment to e-mail from Alina Bedrossian on 03/21/2017 at 09:16 AM gives
 this assignment::
   Antenna Type	Switch	CDSCC	  GDSCC	  MDSCC
       BWG1	      1	    34_S1	  24_S1	  54_S1
-	                2	    34_X1	  26_S1	  54_X1
-	                3	    34_Ka1	15_X1	  54_Ka1
+	              2	    34_X1	  26_S1	  54_X1
+	              3	    34_Ka1	  15_X1	  54_Ka1
       BWG2	      4	    35_X1	  25_X1	  55_X1
-	                5	    35_Ka1	25_Ka1	55_Ka1
+	              5	    35_Ka1	  25_Ka1  55_Ka1
       BWG3	      6	    36_S1	  15_S1	  65_S1
-	                7	    36_X1	  26_X1	  65_X1
-	                8	    36_Ka1	26_Ka1	63_X2
+	              7	    36_X1	  26_X1	  65_X1
+	              8	    36_Ka1	  26_Ka1  63_X2
       70-m	      9	    43_S1	  14_S1	  63_S1
-	               10	    43_X1	  14_X1	  63_X1
-      AUX	       11	    AUX1	  AUX1	  AUX1
-	               12	    AUX2	  AUX2	  AUX2
+	             10	    43_X1	  14_X1	  63_X1
+      AUX	     11	    AUX1	  AUX1	  AUX1
+	             12	    AUX2	  AUX2	  AUX2
 
 """
 import logging
@@ -53,7 +53,8 @@ def station_configuration(context,
   Equipment keys are 'Telescope', 'FE_selector', 'FrontEnd', 'Rx_selector',
   'Receiver', 'IF_switch', 'Backend' and 'sampling_clock'.  They will become
   instances of hardware clients. The default value for each is None, to be
-  corrected as appropriate by a specific configuration.
+  corrected as appropriate by a specific configuration. If left None, the client
+  is still included but is instantiated without connecting to the server.
   
   Argument 'hardware' specifies whether a client is to be connected.
 
@@ -68,6 +69,7 @@ def station_configuration(context,
 
   @return: lab,equipment
   """
+  global station_configuration
   equipment = {'Antenna':        None,    # subclass of Telescope with NMC control
                'FE_selector':    None,
                'FrontEnd':       None,
@@ -85,10 +87,16 @@ def station_configuration(context,
     else:
       hardware[key] = False
   logger.debug("station_configuration: hardware is %s", hardware)
-  
-  if context in configs:
+  logger.debug("station_configuration: context is %s", context)
+  if context in list(configs):
+    exec_text = "global station_configuration; from "+configs[context]+" import station_configuration"
+    logger.debug('station_configuration: executing "%s"', exec_text)
     # invoke the desired configuration
-    exec("from "+configs[context]+" import station_configuration")
+    try:
+      exec(exec_text)
+    except Exception as report:
+      logger.error("station_configuration: error: %s", report)
+      raise RuntimeError("executing context configuration failed")
   else:
     logger.error('station_configuration: "%s" is not a valid context',context)
     logger.error('station_configuration: valid contexts are: %s', list(configs.keys()))
