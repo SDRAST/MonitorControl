@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBDC_base &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="WVSRbackend" href="MonitorControl.BackEnds.DSN.WVSRbackend.html" />
+    <link rel="prev" title="DSN_rx" href="MonitorControl.Receivers.DSN.DSN_rx.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.DSN.WVSRbackend.html" title="WVSRbackend"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Receivers.DSN.DSN_rx.html" title="DSN_rx"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">WBDC_base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wbdc-base">
+<h1>WBDC_base<a class="headerlink" href="#wbdc-base" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.Receivers.WBDC.</code><code class="sig-name descname">WBDC_base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.Receivers.Receiver.html#MonitorControl.Receivers.Receiver" title="MonitorControl.Receivers.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.Receivers.Receiver</span></code></a></p>
+<p>Base class for a DSN K-band wideband down-converter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>       <span class="o">---</span>      <span class="o">---</span>        <span class="o">---</span>                <span class="o">---</span>
+       <span class="o">|</span> <span class="o">|--</span><span class="n">P1</span><span class="o">--|</span> <span class="o">|--</span><span class="n">D1P1</span><span class="o">--|</span> <span class="o">|==</span> <span class="mi">5</span> <span class="n">sub</span><span class="o">-</span><span class="n">bands</span><span class="o">==|</span> <span class="o">|==</span><span class="n">D1PA</span>
+       <span class="o">|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">|</span> <span class="o">|</span>
+<span class="o">&gt;--</span><span class="n">B1</span><span class="o">--|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>                           <span class="o">|</span> <span class="o">|</span>
+       <span class="o">|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">|</span> <span class="o">|</span>
+       <span class="o">|</span> <span class="o">|--</span><span class="n">P2</span><span class="o">--|</span> <span class="o">|--</span><span class="n">D1P2</span><span class="o">--|</span> <span class="o">|==</span> <span class="mi">5</span> <span class="n">sub</span><span class="o">-</span><span class="n">bands</span><span class="o">==|</span> <span class="o">|==</span><span class="n">D1PB</span>
+       <span class="o">---</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">---</span>
+               <span class="o">|</span> <span class="o">|</span>
+       <span class="o">---</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">---</span>
+       <span class="o">|</span> <span class="o">|--</span><span class="n">P1</span><span class="o">--|</span> <span class="o">|--</span><span class="n">D2P1</span><span class="o">--|</span> <span class="o">|==</span> <span class="mi">5</span> <span class="n">sub</span><span class="o">-</span><span class="n">bands</span><span class="o">==|</span> <span class="o">|==</span><span class="n">D2PA</span>
+       <span class="o">|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">|</span> <span class="o">|</span>
+<span class="o">&gt;--</span><span class="n">B2</span><span class="o">--|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>                           <span class="o">|</span> <span class="o">|</span>
+       <span class="o">|</span> <span class="o">|</span>      <span class="o">|</span> <span class="o">|</span>        <span class="o">---</span>                <span class="o">|</span> <span class="o">|</span>
+       <span class="o">|</span> <span class="o">|--</span><span class="n">P2</span><span class="o">--|</span> <span class="o">|--</span><span class="n">D2P2</span><span class="o">--|</span> <span class="o">|==</span> <span class="mi">5</span> <span class="n">sub</span><span class="o">-</span><span class="n">bands</span><span class="o">==|</span> <span class="o">|==</span><span class="n">D2PB</span>
+       <span class="o">---</span>      <span class="o">---</span>        <span class="o">---</span>                <span class="o">---</span>
+       <span class="n">OMT</span>     <span class="n">Xswitch</span>  <span class="n">RFsection</span>       <span class="n">pol_section</span> <span class="n">X</span> <span class="mi">5</span>
+<span class="o">&lt;---</span><span class="n">K_4ch</span><span class="o">--&gt;</span>  <span class="o">&lt;-----------------</span><span class="n">WBDC2</span><span class="o">-----------------&gt;</span>
+</pre></div>
+</div>
+<p>The DSN K-band WBDC systems have two dual polarization feeds. The feeds can
+be interchanged with a pair of transfer switches.</p>
+<p>The signals from each feed and pol enter an RF section which splits the full
+band into five RF sub-bands and also measures the power coming in to the
+RF section.</p>
+<p>The five outputs from each of the RF section for each pol are passed into a
+polarization section.</p>
+<p>Class variables are used to name the sections of the WBDC.</p>
+<p>WARNING!  RFsection method _rename_beam is very dependent on the naming
+convention used, specifically, the length of the names.</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.DC_names" title="MonitorControl.Receivers.WBDC.WBDC_base.DC_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DC_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.IF_names" title="MonitorControl.Receivers.WBDC.WBDC_base.IF_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IF_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.RF_names" title="MonitorControl.Receivers.WBDC.WBDC_base.RF_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RF_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.out_pols" title="MonitorControl.Receivers.WBDC.WBDC_base.out_pols"><code class="xref py py-obj docutils literal notranslate"><span class="pre">out_pols</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.pol_names" title="MonitorControl.Receivers.WBDC.WBDC_base.pol_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pol_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.get_crossover" title="MonitorControl.Receivers.WBDC.WBDC_base.get_crossover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_crossover</span></code></a>()</p></td>
+<td><p>Get the cross-over switch state</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.Receivers.WBDC.WBDC_base.set_crossover" title="MonitorControl.Receivers.WBDC.WBDC_base.set_crossover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_crossover</span></code></a>([crossover])</p></td>
+<td><p>Set or unset the cross-over switch</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.DC_names">
+<code class="sig-name descname">DC_names</code><em class="property"> = ['D1', 'D2']</em><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.DC_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.IF_names">
+<code class="sig-name descname">IF_names</code><em class="property"> = ['I1', 'I2']</em><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.IF_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.RF_names">
+<code class="sig-name descname">RF_names</code><em class="property"> = ['R1', 'R2']</em><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.RF_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.out_pols">
+<code class="sig-name descname">out_pols</code><em class="property"> = ['P1', 'P2']</em><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.out_pols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.pol_names">
+<code class="sig-name descname">pol_names</code><em class="property"> = ['E', 'H']</em><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.pol_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.get_crossover">
+<code class="sig-name descname">get_crossover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.get_crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the cross-over switch state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.Receivers.WBDC.WBDC_base.set_crossover">
+<code class="sig-name descname">set_crossover</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">crossover</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Receivers.WBDC.WBDC_base.set_crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or unset the cross-over switch</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.Receivers.DSN.DSN_rx.html"
+                        title="previous chapter">DSN_rx</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.DSN.WVSRbackend.html"
+                        title="next chapter">WVSRbackend</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.Receivers.WBDC.WBDC_base.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.DSN.WVSRbackend.html" title="WVSRbackend"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Receivers.DSN.DSN_rx.html" title="DSN_rx"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">WBDC_base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

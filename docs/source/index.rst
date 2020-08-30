@@ -34,7 +34,9 @@ Communication between clients and their servers uses the ``Pyro5`` module.
 The central server keeps track of what happens to a signal as it enters the
 telescope (antenna) and progresses to its final digital format for analysis.
 To achieve this there are three base superclasses.
+
 .. image:: baseClasses.png
+   :width: 300
 Each of the clients in the previous figure is a subclass of ``Device`` which
 operates on one or more ``Signal``\ objects that enter and leave *via*
 ``Port`` objects.
@@ -55,14 +57,19 @@ These modules are all part of the base ``MonitorControl`` package.
 .. automodapi:: MonitorControl.FrontEnds
 .. automodapi:: MonitorControl.Receivers
 .. automodapi:: MonitorControl.BackEnds
+.. automodapi:: MonitorControl.Configurations
 
 Context Modules
 ===============
 .. automodapi:: MonitorControl.Antenna.DSN
 .. automodapi:: MonitorControl.FrontEnds.DSN
+.. automodapi:: MonitorControl.FrontEnds.K_band
 .. automodapi:: MonitorControl.Receivers.DSN
+.. automodapi:: MonitorControl.Receivers.WBDC
 .. automodapi:: MonitorControl.BackEnds.DSN
 .. automodapi:: MonitorControl.BackEnds.ROACH1
+.. automodapi:: MonitorControl.Configurations.CDSCC
+.. automodapi:: MonitorControl.Configurations.GDSCC
 
 .. toctree::
    :maxdepth: 2

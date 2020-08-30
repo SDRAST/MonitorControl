@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K_4ch &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DSN_rx" href="MonitorControl.Receivers.DSN.DSN_rx.html" />
+    <link rel="prev" title="DSN_fe" href="MonitorControl.FrontEnds.DSN.DSN_fe.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Receivers.DSN.DSN_rx.html" title="DSN_rx"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.FrontEnds.DSN.DSN_fe.html" title="DSN_fe"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">K_4ch</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="k-4ch">
+<h1>K_4ch<a class="headerlink" href="#k-4ch" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch">
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.FrontEnds.K_band.</code><code class="sig-name descname">K_4ch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_names</span><span class="o">=</span><span class="default_value">[['F1P1', 'F1P2'], ['F2P1', 'F2P2']]</span></em>, <em class="sig-param"><span class="n">hardware</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MonitorControl.FrontEnds.FrontEnd.html#MonitorControl.FrontEnds.FrontEnd" title="MonitorControl.FrontEnds.FrontEnd"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.FrontEnds.FrontEnd</span></code></a></p>
+<p>The 4-channel downconverter with four inputs for two pols and two feeds.</p>
+<p>The class variable lists ‘feeds’ and ‘pols’ will define output port labels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F1P1</span><span class="p">,</span> <span class="n">F1P2</span><span class="p">,</span> <span class="n">F2P1</span><span class="p">,</span> <span class="n">F2P2</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The polarization type is definitely linear but the orientations are not
+yet known.</p>
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">Pulic::</code></dt>
+<dd><p>channel  - electronics associated with a feed
+data     - dict of properties like bandwidth and center frequency
+hardware - remote hardware server
+logger   - logging.Logger object
+name     - text identifier
+outputs  - Port objects</p>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>This version uses the legacy FE_Pyro_server, which needs to be replaced with
+something more capable.</p>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.Tsys_vacuum" title="MonitorControl.FrontEnds.K_band.K_4ch.Tsys_vacuum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tsys_vacuum</span></code></a>([beam, pol, mode, elevation])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.feed_states" title="MonitorControl.FrontEnds.K_band.K_4ch.feed_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feed_states</span></code></a>()</p></td>
+<td><p>Report the waveguide load state</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.get_ND_state" title="MonitorControl.FrontEnds.K_band.K_4ch.get_ND_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ND_state</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.read_PMs" title="MonitorControl.FrontEnds.K_band.K_4ch.read_PMs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_PMs</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.read_temps" title="MonitorControl.FrontEnds.K_band.K_4ch.read_temps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_temps</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_off" title="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_off"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_ND_off</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_on" title="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_ND_on</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_temp" title="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_temp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_ND_temp</span></code></a>(value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_off" title="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_off"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_PCG_off</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_on" title="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_PCG_on</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_rail" title="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_rail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_PCG_rail</span></code></a>(spacing)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#MonitorControl.FrontEnds.K_band.K_4ch.update" title="MonitorControl.FrontEnds.K_band.K_4ch.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>()</p></td>
+<td><p>Updates the states</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.Tsys_vacuum">
+<code class="sig-name descname">Tsys_vacuum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">beam</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pol</span><span class="o">=</span><span class="default_value">'R'</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">elevation</span><span class="o">=</span><span class="default_value">90</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.Tsys_vacuum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.feed_states">
+<code class="sig-name descname">feed_states</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.feed_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report the waveguide load state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.get_ND_state">
+<code class="sig-name descname">get_ND_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.get_ND_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.read_PMs">
+<code class="sig-name descname">read_PMs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.read_PMs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.read_temps">
+<code class="sig-name descname">read_temps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.read_temps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_off">
+<code class="sig-name descname">set_ND_off</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_off" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_on">
+<code class="sig-name descname">set_ND_on</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_on" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_ND_temp">
+<code class="sig-name descname">set_ND_temp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_ND_temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_off">
+<code class="sig-name descname">set_PCG_off</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_off" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_on">
+<code class="sig-name descname">set_PCG_on</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_on" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_rail">
+<code class="sig-name descname">set_PCG_rail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spacing</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.set_PCG_rail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="MonitorControl.FrontEnds.K_band.K_4ch.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.FrontEnds.K_band.K_4ch.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the states</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.FrontEnds.DSN.DSN_fe.html"
+                        title="previous chapter">DSN_fe</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.Receivers.DSN.DSN_rx.html"
+                        title="next chapter">DSN_rx</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.FrontEnds.K_band.K_4ch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Receivers.DSN.DSN_rx.html" title="DSN_rx"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.FrontEnds.DSN.DSN_fe.html" title="DSN_fe"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">K_4ch</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

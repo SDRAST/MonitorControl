@@ -1,0 +1,15 @@
+<map id="inheritance19d313fcf9" name="inheritance19d313fcf9">
+<area shape="rect" id="node1" href="api/MonitorControl.Beam.html#MonitorControl.Beam" target="_top" title="Signal class for radiation arriving at a feed." alt="" coords="239,301,311,327"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Signal.html#MonitorControl.Signal" target="_top" title="Class for type of signal passing through a Port object." alt="" coords="44,376,116,401"/>
+<area shape="rect" id="node3" href="api/MonitorControl.ComplexSignal.html#MonitorControl.ComplexSignal" target="_top" title="ComplexSignal class for an RF output from an orthomode or polarizer." alt="" coords="215,351,335,376"/>
+<area shape="rect" id="node8" href="api/MonitorControl.IF.html#MonitorControl.IF" target="_top" title="Electrical signal out of a receiver, suitable for detection or digitization." alt="" coords="239,400,311,425"/>
+<area shape="rect" id="node12" href="api/MonitorControl.Spectrum.html#MonitorControl.Spectrum" target="_top" title="Spectrum" alt="" coords="233,449,317,475"/>
+<area shape="rect" id="node4" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="44,228,116,253"/>
+<area shape="rect" id="node7" href="api/MonitorControl.GainSection.html#MonitorControl.GainSection" target="_top" title="Any device which increases or decreases the power level without" alt="" coords="225,203,325,228"/>
+<area shape="rect" id="node13" href="api/MonitorControl.Switch.html#MonitorControl.Switch" target="_top" title="Three basic switch types are recognized: &quot;1xN&quot;, &quot;Nx1&quot; and &quot;2x2&quot;." alt="" coords="239,252,311,277"/>
+<area shape="rect" id="node5" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="203,153,347,179"/>
+<area shape="rect" id="node6" title="A class that represents a thread of control." alt="" coords="44,153,116,179"/>
+<area shape="rect" id="node9" href="api/MonitorControl.MonitorControlError.html#MonitorControl.MonitorControlError" target="_top" title="Error handler for this module" alt="" coords="5,104,155,129"/>
+<area shape="rect" id="node10" href="api/MonitorControl.Observatory.html#MonitorControl.Observatory" target="_top" title="Defines the Observatory class." alt="" coords="29,55,131,80"/>
+<area shape="rect" id="node11" href="api/MonitorControl.Port.html#MonitorControl.Port" target="_top" title="Class for a signal port in an Device." alt="" coords="44,5,116,31"/>
+</map>

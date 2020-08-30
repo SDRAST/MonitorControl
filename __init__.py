@@ -18,7 +18,6 @@ Signal objects which MUST be used in their names.
 Classes::
 
   MonitorControlError(RuntimeError)
-  MCPublisher(ZmqPublisher)
   Signal(object)                     -
   Beam(Signal)                       - signal with both polarizations present
   ComplexSignal(Signal)              - signal with both I and Q components
@@ -32,6 +31,7 @@ Classes::
   DeviceReadThread(threading.Thread) - gathers data
 
 The module functions are::
+
   ClassInstance     - provides a specific subclass object for a template class
   valid_property    - forces signal properties to follow a naming convention
   show_port_sources - print diagnostic information about ports
@@ -1018,7 +1018,9 @@ def ClassInstance(templateClass, subclass, *args, **kwargs):
 
     It passes the arguments, if any, to the sub-class initializer.  An
     example of using this function::
-    >>>  IFsw = ClassInstance(Switch, JFW50MS287, lab, "Nx1", 0)
+    
+      >>>  IFsw = ClassInstance(Switch, JFW50MS287, lab, "Nx1", 0)
+    
     (The last argument is required for the JFW50MS287 to specify which output
     port it is associated with.)
 

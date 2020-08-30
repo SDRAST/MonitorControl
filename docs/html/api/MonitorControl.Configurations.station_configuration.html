@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>station_configuration &#8212; MonitorControl 0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CallbackHandler" href="MonitorControl.Antenna.DSN.CallbackHandler.html" />
+    <link rel="prev" title="Processor" href="MonitorControl.BackEnds.Processor.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.CallbackHandler.html" title="CallbackHandler"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.Processor.html" title="Processor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">station_configuration</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="station-configuration">
+<h1>station_configuration<a class="headerlink" href="#station-configuration" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="MonitorControl.Configurations.station_configuration">
+<code class="sig-prename descclassname">MonitorControl.Configurations.</code><code class="sig-name descname">station_configuration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">hardware</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">roach_loglevel</span><span class="o">=</span><span class="default_value">30</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.Configurations.station_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Observatory instance and equipment dict for a context</p>
+<p>Equipment keys are ‘Telescope’, ‘FE_selector’, ‘FrontEnd’, ‘Rx_selector’,
+‘Receiver’, ‘IF_switch’, ‘Backend’ and ‘sampling_clock’.  They will become
+instances of hardware clients. The default value for each is None, to be
+corrected as appropriate by a specific configuration. If left None, the client
+is still included but is instantiated without connecting to the server.</p>
+<p>Argument ‘hardware’ specifies whether a client is to be connected.</p>
+<p>:param context : label for the configuration
+:type  context : str</p>
+<p>:param hardware : equipment to be used; default: all
+:type  hardware : dict</p>
+<p>:param roach_loglevel : logging level for corr module
+:type  roach_loglevel : logging module logging level or int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>lab,equipment</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="MonitorControl.BackEnds.Processor.html"
+                        title="previous chapter">Processor</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="MonitorControl.Antenna.DSN.CallbackHandler.html"
+                        title="next chapter">CallbackHandler</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/MonitorControl.Configurations.station_configuration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.Antenna.DSN.CallbackHandler.html" title="CallbackHandler"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MonitorControl.BackEnds.Processor.html" title="Processor"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MonitorControl 0.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">station_configuration</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, T.B.H. Kuiper.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

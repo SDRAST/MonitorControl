@@ -1,0 +1,5 @@
+<map id="inheritance18faae2bea" name="inheritance18faae2bea">
+<area shape="rect" id="node1" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node2" href="api/MonitorControl.Receivers.Receiver.html#MonitorControl.Receivers.Receiver" target="_top" title="Device which converts RF signals to IF signals for detection or digitization" alt="" coords="125,5,204,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.Receivers.WBDC.WBDC_base.html#MonitorControl.Receivers.WBDC.WBDC_base" target="_top" title="Base class for a DSN K&#45;band wideband down&#45;converter::" alt="" coords="252,5,353,31"/>
+</map>
