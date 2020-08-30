@@ -19,3 +19,6 @@
 [submodule "Receivers/WBDC"]
 	path = Receivers/WBDC
 	url = git@github.com:SDRAST/Receivers_WBDC.git
+[submodule "Configurations/CDSCC"]
+	path = Configurations/CDSCC
+	url = git@github.com:SDRAST/Configurations_CDSCC.git
