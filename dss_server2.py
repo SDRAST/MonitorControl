@@ -14,7 +14,8 @@ On host kuiper, conda is the environment manager:
 
   $ source activate DSSserver
 
-Example:
+Examples
+========
   $ python dss_server2.py --help
   usage: dss_server2.py [-h] [--verbose] [--simulated] [--flask] [--flaskio]
 
@@ -27,8 +28,6 @@ Example:
                      antenna hardware server.
     --flask, -f      Run server as flask server
     --flaskio, -fio  Run server as flask io server
-
-Note that the DSSserver conda environment does not currently have ipython.
 
 Note that the Flask interface does not support callbacks in the server, that is,
 all callback handler trying to use a callback method to return data will fail.
@@ -84,6 +83,18 @@ Example of session to test the server::
    'IF_switch': IFswitch "Patch Panel",   'Antenna': DSN_Antenna "DSS-43",
    'Receiver': WBDC2 "WBDC-2"}
 
+Notes
+=====
+The Flask client can make two sorts of calls on the server, with arguments and
+without.  If no arguments are given, then the server method should have a normal
+``return``.  If the client passes arguments, then the method should have a
+decorator ``@async_method`` and should return data to the client with callbacks
+with names like this:
+
+  servermethod.cb(data)
+
+A decorated method can still have a normal ``return`` for when it is called
+from within the server program itself.
 """
 
 
@@ -105,9 +116,9 @@ import numpy as np
 import os
 import Pyro5
 import queue
+import random
 import time
 import socket
-import threading
 import signal
 import six
 
@@ -128,11 +139,12 @@ from MonitorControl import ActionThread, MonitorControlError
 from MonitorControl.DSS_server_cfg import tams_config # not really TAMS
 from MonitorControl.Configurations  import station_configuration
 from MonitorControl.Configurations.GDSCC.WVSR  import station_configuration as std_configuration
-import MonitorControl.Configurations.projects as projects
+import MonitorControl.Configurations.projects as projcfg
 from MonitorControl.Receivers.DSN import DSN_rx
 from Physics.Radiation.Lines.recomb_lines import recomb_freq
 from Radio_Astronomy.bands import frequency_to_band
 from support import hdf5_util
+from support.async_method import async_method
 from support.local_dirs import projects_dir 
 from support.logs import setup_logging
 from support.pyro.pyro5_server import Pyro5Server
@@ -192,8 +204,8 @@ class DSSServer(Pyro5Server):
                            for retrieving old boresight results.
         configs:           a list of all known hardware configurations
         fe_signals
-        FITSqueue
-        FITSwriter
+        specQueue
+        specHandler
         info:              (dict) dictionary containing information about current
                            status of different long running calibration and
                            observation methods, as well as sources, and verifiers.
@@ -377,7 +389,7 @@ class DSSServer(Pyro5Server):
         """
         super(DSSServer, self).__init__(obj=self, **kwargs)
 
-        if project not in projects.get_projects():
+        if project not in projcfg.get_projects():
           self.logger.error("__init__: %s not recognized", project)
           raise RuntimeError("%s is invalid projecty" % project)
         self.logger.debug("__init__: project is %s", project)
@@ -431,6 +443,11 @@ class DSSServer(Pyro5Server):
         #self.last_spectra_file = "/var/tmp/last_spectrum.json"
         #self.backend.init_disk_monitors()
         #self.backend.observer.start() <<<<<<<<<<<<<< not working; maybe not needed
+        self.specQueue = queue.Queue()
+        self.specHandler = ActionThread(self, self.integr_done,
+                                       name="specHandler")
+        self.specHandler.daemon = True
+        self.specHandler.start()
         self.logger.debug("__init__: done")
 
     def initialize_FITS(self):
@@ -450,11 +467,6 @@ class DSSServer(Pyro5Server):
         self.hdulist = pyfits.HDUList(self.HDUs)
         self.logger.debug("initialize_FITS: HDU list created")
         self.filename = "/var/tmp/test-"+str(time.time())+".fits"
-        self.FITSqueue = queue.Queue()
-        self.FITSwriter = ActionThread(self, self.add_data_to_FITS,
-                                       name="FITSwriter")
-        self.FITSwriter.daemon = True
-        self.FITSwriter.start()
 
     def init_binary_table(self, numscans=100, observer="Horiuchi"):
         """
@@ -577,7 +589,6 @@ class DSSServer(Pyro5Server):
         # empty table
         return tabhdu
 
-    @Pyro5.api.oneway
     def save_FITS(self):
         """
         Save FITS HDU list to file
@@ -606,13 +617,13 @@ class DSSServer(Pyro5Server):
             "save_FITS: Took {:.3f} seconds to copy FITS data".format(
                 time.time() - t0))
         t0 = time.time()
-        #hdulist.writeto(self.filename, overwrite=True)
-        #del savePriHDU
-        #del saveRec
-        #del saveBinTab
-        #del saveHDUs
-        #del hdulist
-        #self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
+        hdulist.writeto(self.filename, overwrite=True)
+        del savePriHDU
+        del saveRec
+        del saveBinTab
+        del saveHDUs
+        del hdulist
+        self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
         #self.save_FITS.cb({"status": "saved to %s" % self.filename})
 
     def _config_hw(self, context,
@@ -709,7 +720,7 @@ class DSSServer(Pyro5Server):
             },
             "project": {
                 "name": project,
-                "source_dir": projects_dir+project+"/Observations",
+                "source_dir": projects_dir+project,
             },
             "sources": {},
             "verifiers": {},
@@ -725,7 +736,7 @@ class DSSServer(Pyro5Server):
 
     # ------------------ Start-up and shut-down methods -----------------------
 
-    @Pyro5.api.oneway
+    @async_method
     def set_info(self, path, val):
         """
         Set some path within ``_info`` attribute in a thread safe manner
@@ -752,7 +763,7 @@ class DSSServer(Pyro5Server):
             self.set_info.cb() # no response to client
 
     @auto_test()
-    @Pyro5.api.oneway
+    @async_method
     def get_info(self, path=None):
         """
         Get some path in ``_info`` attribute in thread safe attribute
@@ -898,6 +909,7 @@ class DSSServer(Pyro5Server):
         self.equipment = equipment
 
     @Pyro5.api.oneway
+    @async_method
     def hdwr(self, hdwr, method_name, *args, **kwargs):
         """
         Call some arbitrary method from the station's equipment.
@@ -931,11 +943,11 @@ class DSSServer(Pyro5Server):
         Returns:
             results of hdwr, if not interacting with server remotely.
         """
-        #self.logger.debug("hdwr: {} method '{}' called".format(hdwr, method_name))
+        self.logger.debug("hdwr: {} method '{}' called".format(hdwr, method_name))
         if hdwr not in self.equipment:
             raise MonitorControlError([], "Couldn't find {} in equipment".format(hdwr))
         elif self.equipment[hdwr].hardware == False:
-          self.emulate(hdwr, method_name)
+          result = self.emulate(hdwr, method_name)
         else:
           hdwr_obj = self.equipment[hdwr]
           self.logger.debug("hdwr: hardware is %s", hdwr_obj)
@@ -943,18 +955,21 @@ class DSSServer(Pyro5Server):
               method = getattr(hdwr_obj, method_name)
               self.logger.debug("hdwr: method is %s", method)
               if callable(method):
+                self.logger.debug("hdwr: args: {}".format(args))
+                self.logger.debug("hdwr: kwargs: {}".format(kwargs))
                 result = method(*args, **kwargs)
               else:
                 result = method # accessing an attribute
               self.logger.debug("hdwr: result: %s", result)
-              try:
-                self.parse_result(result)
-              except Exception as details:
-                raise MonitorControlError([], "parsing {} failed".format(result))
-              self.hdwr.cb(result) # send client the result
-              return result
           except AttributeError as err:
-            raise MonitorControlError([], "Couldn't find method {} for {}".format(method_name, hdwr))
+            raise MonitorControlError([],
+                     "Couldn't find method {} for {}".format(method_name, hdwr))
+        try:
+          self.parse_result(result)
+        except Exception as details:
+          raise MonitorControlError([], "parsing {} failed".format(result))
+        self.hdwr.cb(result) # send client the result
+        return result
 
     def emulate(self, hdwr, method_name):
         """
@@ -962,14 +977,18 @@ class DSSServer(Pyro5Server):
         emulate server commands called by this program.  That requires
         emulation in the equipment server itself.
         """
+        self.logger.debug("emulate: called %s method %s", hdwr, method_name)
         if hdwr == "Backend":
           if method_name == "roachnames":
             return ['sao64k-1', 'sao64k-2', 'sao64k-3', 'sao64k-4']
         elif hdwr == "FrontEnd":
           if method_name == "read_PMs":
-            return [48., 49., 50., 51.]
+            return [(1, 4.8000e-08*(1+random.random()/48)), 
+                    (2, 1.1612e-07*(1+random.random()/80)), 
+                    (3, 3.6388e-08*(1+random.random()/25)), 
+                    (4, 7.2258e-08*(1+random.random()/51))]
         else:
-          self.logger.debug("emulate: called %s method %s", hdwr, method_name)
+          self.logger.debug("emulate: not coded for %s.%s()", hdwr, method_name)
 
     def get_antenna_angles(self):
         self.hdwr("Antenna", "get", "AzimuthAngle",
@@ -1013,7 +1032,6 @@ class DSSServer(Pyro5Server):
         if 'winddirection' in result:
           self.winddirection = float(result['winddirection'])
       else:
-        pass
         self.logger.info('parse_result: %s', result)
 
     @auto_test()
@@ -1026,7 +1044,7 @@ class DSSServer(Pyro5Server):
 
     # ------------------------- Source Management -----------------------------
 
-    @Pyro5.api.oneway
+    @async_method
     def load_sources(self, loader="json"):
         """
         Load sources and verifiers into memory
@@ -1047,20 +1065,25 @@ class DSSServer(Pyro5Server):
         returns contents of 'calibrators', 'sources', and 'verifiers' files
         """
         # try activities first
-        if project_or_activity in self.get_activities():
-          path = act_proj_path + project_or_activity+"/"
-        elif project_or_activity in self.get_projects():
-          path = projects_dir + project_or_activity+"/Observations/"
+        projects = self.get_projects()
+        project = self.info['project']['name']
+        if project_or_activity == project:
+          # its a project
+          path = proj_conf_path + project + "/"
+        elif project_or_activity in projects[project_or_activity]:
+          # it's a project activity
+          path = proj_conf_path + project_or_activity+"/"
         else:
-          self.logger.error("get_sources_and_verifiers: activity or project %s not found",
-                            project_or_activity)
+          self.logger.error(
+                  "get_sources_and_verifiers: activity or project %s not found",
+                  project_or_activity)
           return None
-        #self.logger.debug("get_sources_and_verifiers: path is %s", path)
+        self.logger.debug("get_sources_and_verifiers: path is %s", path)
         with open(path+"sources.json", "r") as f:
             sources = json.load(f)
         with open(path+"verifiers.json", "r") as f:
             verifiers = json.load(f)
-        with open(act_proj_path+"calibrators.json", "r") as f:
+        with open(proj_conf_path+"calibrators.json", "r") as f:
             calibrators = json.load(f)
         return sources, verifiers, calibrators
 
@@ -1375,17 +1398,17 @@ class DSSServer(Pyro5Server):
             return sources
         return
 
-    @Pyro5.api.oneway
+    @async_method
     def get_styles(self):
       self.get_styles.cb(self.styles)
       return self.styles
 
-    @Pyro5.api.oneway
+    @async_method
     def get_ordered(self):
       self.get_ordered.cb(self.ordered)
       return self.ordered
 
-    @Pyro5.api.oneway
+    @async_method
     def get_sources(self, source_names=None, when=None, filter_fn=None,
                     formatter=None):
         """
@@ -2500,7 +2523,7 @@ class DSSServer(Pyro5Server):
         })
         return analyzer_obj
 
-    @Pyro5.api.oneway
+    @async_method
     def get_boresight_file_paths(self, **kwargs):
         """
         Call the BoresightManager.detect_file_paths static method.
@@ -2524,7 +2547,6 @@ class DSSServer(Pyro5Server):
         )
         return file_paths
 
-    @Pyro5.api.oneway
     def get_boresight_analyzer_object(self, file_path):
         """
         Get a file analyzer object from the manager attribute.
@@ -2558,7 +2580,7 @@ class DSSServer(Pyro5Server):
             obj_dict = None
         return obj_dict
 
-    @Pyro5.api.oneway
+    @async_method
     def get_most_recent_boresight_analyzer_object(self):
         """
         Get the most recent boresight results.
@@ -2940,11 +2962,16 @@ class DSSServer(Pyro5Server):
     # --------------------------------- Data Acquisition ----------------------
 
     @auto_test()
+    #@async_method
     def get_tsys(self, timestamp=False):
         """
         Get system temperature, in units of Kelvin, i.e. power meter readings
         multipled by factors derived from flux calibration.
 
+        Notes
+        =====
+        Typical result from the power meters::
+          [4.800e-08, 1.1612e-07, 3.6388e-08, 7.22583e-08]
         Args:
             timestamp (boolean, optional): Return a timestamp along with readings.
 
@@ -2953,22 +2980,24 @@ class DSSServer(Pyro5Server):
                 datetime.datetime object corresponding to when readings were
                 requested.
         """
+        self.logger.debug("get_tsys: entered; calling hdwr")
         res = self.hdwr("FrontEnd", "read_PMs")
-        #tsys = [res[i][-1]*self.info["flux_calibration"]["tsys_factors"][i]
-        #                                              for i in range(len(res))]
+        self.logger.debug("get_tsys: hdwr response: %s", res)
         tsys = []
         for i in range(len(res)):
           reading = res[i][-1]
           if reading > 1:
             reading = 0
           tsys.append(reading*self.info["flux_calibration"]["tsys_factors"][i])
+        self.logger.debug("get_tsys: returns %s", tsys)
         if not timestamp:
-            return tsys
+          #self.get_tsys.cb(tsys)
+          return tsys
         else:
-            # timestamp = [datetime.datetime.strptime(res[i][-2],  "%a %b %d %H:%M:%S %Y") for i in range(len(res))][0]
-            timestamp = datetime.datetime.utcnow()
-            # self.logger.debug("get_tsys: timestamp: {}".format(timestamp))
-            return timestamp, tsys
+          timestamp = datetime.datetime.utcnow()
+          self.logger.debug("get_tsys: timestamp: {}".format(timestamp))
+          #self.get_tsys.cb(tsys)
+          return timestamp, tsys
 
     @Pyro5.api.oneway
     def get_spectrum(self):
@@ -3078,7 +3107,7 @@ class DSSServer(Pyro5Server):
             n_scans += 1
           # start in beam 1; add boresight offsets to this!!!!!!!!!!!!!!!!!!!!!!!!!
           self.hdwr("Antenna", "set_offset_one_axis", "EL", 0)
-          self.hdwr("Antenna", "set_offse{\ttfamily DSSServer}t_one_axis", "XEL", 0)
+          self.hdwr("Antenna", "set_offset_one_axis", "XEL", 0)
         self.n_scans = n_scans
         self.n_spectra = n_spectra
 
@@ -3090,7 +3119,8 @@ class DSSServer(Pyro5Server):
         # other stuff from servers
         self.bandwidth = self.backend.bandwidth
         self.num_chan = self.backend.num_chan
-        self.obsfreq = self.frontend.data['frequency']*1e6 # needs to be based on DC channel
+        # ``obsfreq`` needs to be based on DC channel
+        self.obsfreq = self.frontend.data['frequency']*1e6 
         self.record_int_time = int_time
         self.polcodes = self.backend.polcodes()
         self.logger.debug("start_spec_scans: integration time is %s", int_time)
@@ -3105,19 +3135,13 @@ class DSSServer(Pyro5Server):
         self.spectra_left = n_spectra
         self.equipment['Backend'].start_recording(parent=self,
                                                n_accums=n_spectra,
-                                               integration_time=int_time,
-                                               callback=self.start_spec_handler)
+                                               integration_time=int_time)
         self.logger.debug("start_spec_scans: backend start recording called")
-        self.start_spec_scans.cb({"left": self.scans_left}) # sent to client
+        #self.start_spec_scans.cb({"left": self.scans_left}) # sent to client
 
-    def invoke_start_spec_callback(self, msg):
-        self.logger.debug("invoke_start_spec_callback: called")
-        # self.start_spec_scans.cb(msg)
-        self.start_spec_cb_handler(msg)
-
-    def squish(self, table, logY=True, n_avg=None, mid_chan=None):
+    def squish(self, table_array, logY=True, n_avg=None, mid_chan=None):
         """
-        Compress columns ia a spectrum table formatted for Google Charts
+        Compress columns in a spectrum table formatted for Google Charts
 
         @param table_array : spectrum table as a numpy array
         """
@@ -3128,11 +3152,11 @@ class DSSServer(Pyro5Server):
         self.logger.debug("squish: will average channels by %d", n_avg)
         if mid_chan == None:
           mid_chan = self.mid_chan # not used
-        table_array = np.array(table)
+        #table_array = np.array(table)
         num_chans, num_specs = table_array.shape
         self.logger.debug("squish: table has %d rows and %d columns",
                           num_chans, num_specs)
-        new_array = table_array.reshape(num_chans/n_avg, n_avg, num_specs)
+        new_array = table_array.reshape(num_chans//n_avg, n_avg, num_specs)
         self.logger.debug("squish: new table shape is %s", new_array.shape)
         squished_array = new_array.mean(axis=1)
         self.logger.debug("squish: squished array: %s", squished_array)
@@ -3225,6 +3249,24 @@ class DSSServer(Pyro5Server):
           diffs[pol] = res["data"][bm1roach] - res["data"][bm2roach]
         return diffs
 
+    def format_as_nparray(self, res):
+        """
+        convert dict of ROACH spectra to 2D array
+        """
+        scan = res["scan"]
+        record = res["record"]
+        data = res["data"]
+        self.logger.debug("format_as_nparray: for scan %d record %d", scan, record)
+        datakeys = list(data.keys())
+        self.logger.debug("display_data: data keys: %s", datakeys)
+        datakeys.sort()
+        datalists = []
+        for roach in datakeys:
+          self.logger.debug("display_data: %s has %d samples", roach, len(data[roach]))
+          datalists.append(data[roach])
+        data_array = np.array(datalists).transpose()
+        return data_array
+        
     def display_data(self, res):
         """
         This creates a gallery of spectral data sets suitable got Google Charts
@@ -3236,8 +3278,13 @@ class DSSServer(Pyro5Server):
         scan = res["scan"]
         record = res["record"]
         data = res["data"]
+        self.logger.debug("display_data: for scan %d record %d", scan, record)
+        # convert list of dicts to a table
+        self.data_array = self.format_as_nparray(res)
+        # add signal names
         feed_sig = self.fe_signals
-        squished = self.squish(res["data"]).tolist()
+        #squished = self.squish(data).tolist()
+        squished = self.squish(self.data_array).tolist()
         spectra_table = [['Frequency'] + feed_sig] + squished
         if scan in self.gallery:
           pass
@@ -3247,14 +3294,13 @@ class DSSServer(Pyro5Server):
         self.logger.debug("display_data: stored scan %d record %d", scan, record)
         return spectra_table
 
-    def add_data_to_FITS(self):
+    def add_data_to_FITS(self, res):
         """
         Polulate the next row of the FITS binary table
 
         In the case where 'record' = 0, all the columns are populated.  When it
         is not, then only the time-dependent columns get added to.
         """
-        res = self.FITSqueue.get()
         scan, record, data = res["scan"], res["record"], res["data"]
         # index is the row number of the scan in the set of scans
         index = scan - 1 # FITS scans are 1-based
@@ -3262,7 +3308,7 @@ class DSSServer(Pyro5Server):
           pass
         else:
           self.scans.append(scan)
-        if record == 0:
+        if record == 1:
           # these data are constant for the scan
           self.source = self.info["point"]["current_source"]
           if self.source:
@@ -3272,8 +3318,8 @@ class DSSServer(Pyro5Server):
           else:
             self.logger.warning("add_data_to_fits: no source seleted")
             self.bintabHDU.data[index]['OBJECT'] = "no source"
-            self.RA = 0
-            self.dec = 0
+            self.RA = 0.0
+            self.dec = 0.0
             self.bintabHDU.data[index]['VELOCITY'] = 0
           self.bintabHDU.data[index]['EXPOSURE'] = self.record_int_time
           self.bintabHDU.data[index]['BANDWIDT'] = self.bandwidth
@@ -3365,27 +3411,27 @@ class DSSServer(Pyro5Server):
         tsys = self.get_tsys()
         self.logger.debug("add_data_to_FITS: TSYS: %s", tsys)
         # data array has shape (32768,5)
-        self.data_array = np.array(data)
+        #self.data_array = np.array(data)
         self.logger.debug("add_data_to_FITS: data_array shape is %s",
                           self.data_array.shape)
-        data_only = self.data_array[:,1:] # the first column is frequency
-        self.logger.debug("add_data_to_FITS: dat~\ref{sec:spectra-20190621}a_only shape is %s",
-                          data_only.shape)
+        #data_only = self.data_array[:,1:] # the first column is frequency
+        self.logger.debug("add_data_to_FITS: data_only shape is %s",
+                          self.data_array.shape)
         for ridx in range(4):
           roach = self.roachnames[ridx]
           pol = self.pols[ridx]
           beam = self.beams[ridx]
-          data = data_only[:,ridx]
+          data = self.data_array[:,ridx]
           self.bintabHDU.data[index]['data'][beam,record,pol,0,0,:] = data
           self.bintabHDU.data[index]['TSYS'][beam,record,pol,0,0,0] = tsys[ridx]
-          self.logger.debug("add_data_to_FITS: stored scan %d, record %d, pol %d, beam %d for %s at row %d",
+          self.logger.debug(
+          "add_data_to_FITS: stored sc %d, rec %d, pol %d, bm %d for %s at row %d",
                           scan, record, pol, beam, roach, index)
-        #self.logger.debug("add_data_to_FITS: %d scans left to do", self.scans_left) << out of sync with handler
         if self.spectra_left == 0:
+          # save scan
           self.save_FITS()
 
-    @Pyro5.api.callback
-    def start_spec_handler(self, *args):
+    def integr_done(self):
         """
         process the output from start_handler
 
@@ -3397,48 +3443,50 @@ class DSSServer(Pyro5Server):
          'data':   list[lists]}
         where the inner lists are rows of a table.
         """
-        self.logger.debug("start_spec_cb_handler: called")
-        res = args[0]
-        try:
-          self.start_spec_scans.cb({"entered": True,
-                                    "time": time.strftime("%Y/%j %H:%M:%S",
-                                                          time.gmtime())
-                                   })
-        except AttributeError as err:
-          self.logger.debug("start_spec_cb_handler: cb-1 failed: {}".format(err))
-          pass
+        self.logger.debug("integr_done: called")
+        #try:
+        #  self.start_spec_scans.cb({"entered": True,
+        #                            "time": time.strftime("%Y/%j %H:%M:%S",
+        #                                                  time.gmtime())
+        #                           })
+        #except AttributeError as err:
+        #  self.logger.debug("start_spec_cb_handler: cb-1 failed: {}".format(err))
+        #  pass
+        res = self.backend.cb_receiver.queue.get()
+        self.logger.debug("integr_done: got %s message", type(res))
         if type(res) == dict:
-          self.logger.debug("start_spec_cb_handler: invoked with keys: %s", list(res.keys()))
+          self.logger.debug("integr_done: invoked with keys: %s",
+                            list(res.keys()))
           # process a spectrum table
           if "type" in res and res["type"] == "data":
             # notify the client that a record has been received
-            try:
-              self.start_spec_scans.cb({"type": "start",
-                                        "scan": res["scan"],
-                                        "record": res["record"]})
-            except AttributeError as details:
-              self.logger.debug("start_spec_cb_handler: cb-2 failed: %s", str(details))
-              pass
+            #try:
+            #  self.start_spec_scans.cb({"type": "start",
+            #                            "scan": res["scan"],
+            #                            "record": res["record"]})
+            #except AttributeError as details:
+            #  self.logger.debug("integr_done: cb-2 failed: %s", str(details))
+            #  pass
+            # reformat 
             # get the ROACH input signals
             self.get_signals()
             # format table for Google Charts
             spectra_table = self.display_data(res)
-            # add to FITS file
             self.spectra_left -= 1
-            self.logger.debug("start_spec_cb_handler: %d spectra left", self.spectra_left)
-            self.FITSqueue.put(res)
-            self.logger.debug("start_spec_cb_handler: data put on FITS queue")
-            # switching
+            self.logger.debug("integr_done: %d spectra left", self.spectra_left)
+            # add to FITS row and add to FITS file when spectra_left = 0.
+            self.add_data_to_FITS(res)
+            # beam and/or position switching if appropriate.
             if self.spectra_left:
               # not yet done
               pass
             else:
               # finish the scan
-              self.logger.debug("start_spec_cb_handler: spectra done")
+              self.logger.debug("integr_done: spectra done")
               # manage antenna according to observing mode
-              if self.obsmode == "BMSW" or self.obsmode == "PBSW":
-                self.logger.debug("start_spec_cb_handler: obsmode is %s", self.obsmode)
-                self.logger.debug("start_spec_cb_handler: %d scans left", self.scans_left)
+              if self.obsmode[4:] == "BMSW" or self.obsmode[4:] == "PBSW":
+                self.logger.debug("integr_done: obsmode is %s", self.obsmode)
+                self.logger.debug("integr_done: %d scans left", self.scans_left)
                 # beam sw. or beam and pos. sw.; # switch beams
                 if self.scans_left % 2:
                   # odd scans are beam 2
@@ -3448,7 +3496,7 @@ class DSSServer(Pyro5Server):
                   # reference beam offset
                   self.el_offset = 14
                   self.xel_offset = 31
-                self.logger.debug("start_spec_cb_handler: sending offset commands EL=%d, XEL=%d",
+                self.logger.debug("integr_done: sending offset commands EL=%d, XEL=%d",
                                   self.el_offset, self.xel_offset)
                 self.hdwr("Antenna", "set_offset_one_axis", "EL",  self.el_offset)
                 self.hdwr("Antenna", "set_offset_one_axis", "XEL", self.xel_offset)
@@ -3456,7 +3504,7 @@ class DSSServer(Pyro5Server):
                 self.start_spec_scans.cb({"xel_offset": self.xel_offset,
                                           "el_offset": self.el_offset})
               self.scans_left -= 1
-              self.logger.debug("start_spec_cb_handler: now %d scans left", self.scans_left)
+              self.logger.debug("integr_done: now %d scans left", self.scans_left)
               if self.scans_left:
                 self.equipment['Backend'].start_recording(parent=self,
                                                           n_accums=self.n_spectra,
@@ -3467,24 +3515,24 @@ class DSSServer(Pyro5Server):
               last_data = {"type":   "saved",
                            "scan":   res["scan"],
                            "record": res["record"]}
-              self.start_spec_scans.cb(last_data)
+              #self.start_spec_scans.cb(last_data)
               #fd = open(self.last_spectra_file, "w")
               #json.dump(last_data, fd)
               #fd.close()
             except AttributeError as details:
-              self.logger.debug("start_spec_cb_handler: cb-3 failed: %s", str(details))
+              self.logger.debug("integr_done: cb-3 failed: %s", str(details))
               #pass
-            # decrement spectra left to do
-            self.spectra_left -= 1
+        # did not get a dict but a list instead
         elif type(res) == list:
-          self.logger.error("start_spec_cb_handler: got 'list' type result")
+          self.logger.error("integr_done: got 'list' type result")
           # just the titles
-          self.logger.debug("start_spec_cb_handler: got %s", res[0])
+          self.logger.debug("integr_done: got %s", res[0])
           #self.start_spec_scans.cb(res)
+        # got something other than dict or list
         else:
-          self.logger.debug("start_spec_cb_handler: got type {}".format(type(res)))
+          self.logger.debug("integr_done: got type {}".format(type(res)))
           #self.start_spec_scans.cb(res)
-        self.logger.debug("start_spec_cb_handler: finished")
+        self.logger.debug("integr_done: finished")
 
     @Pyro5.api.oneway
     def two_beam_nod(self,
@@ -3547,7 +3595,7 @@ class DSSServer(Pyro5Server):
 
 # ---------------------------- Miscellaneous Methods --------------------------
 
-    @Pyro5.api.oneway
+    @async_method
     def set_obsmode(self, new_mode):
         self.obsmode = new_mode
         self.logger.debug("set_obsmode: mode is now %s", self.obsmode)
@@ -3639,30 +3687,31 @@ class DSSServer(Pyro5Server):
         server_time(): returns current time
       """
 
-    @Pyro5.api.oneway
+    @async_method
     def get_projects(self):
       """
       get a list of all the projects
       """
       projects = []
-      for project in projects.get_projects():
-        projects.append(get_real_project(project))
+      for project in projcfg.get_projects():
+        projects.append(project)
       projects.sort()
       self.get_projects.cb(projects)
       return projects
 
-    @Pyro5.api.oneway
+    @async_method
     def get_activities(self):
       """
-      get a list of all the activities
+      get a list of all the activities of the current project
       """
-      activities = projects.get_activity()
-      activities.remove('archive')
+      project = self.info['project']['name']
+      activities = projcfg.get_activity()[project]
+      self.logger.debug("get_activities: activities: %s", activities)
       activities.sort()
       self.get_activities.cb(activities)
       return activities
 
-    @Pyro5.api.oneway
+    @async_method
     def get_equipment(self):
       """
       get a list of all the devices in the current configuration
@@ -3674,7 +3723,7 @@ class DSSServer(Pyro5Server):
       self.get_equipment.cb(devices)
       return devices
 
-    @Pyro5.api.oneway
+    @async_method
     def change_project(self, project, activity=None, context=None):
       """
       select new project
@@ -3706,18 +3755,18 @@ class DSSServer(Pyro5Server):
           observatory, equipment = std_configuration(None, self.activity, dss,
                                           now.tm_year, now.tm_yday, timestr, band)
 
-    @Pyro5.api.oneway
+    @async_method
     def get_activitys_project(self, activity):
       """
       get the project associated with the current activity
       """
       self.logger.debug("get_activitys_project: called for %s", activity)
-      project = projects.activity_project(activity)
+      project = projcfg.activity_project(activity)
       self.logger.debug("get_activitys_project: project is %s", project)
       self.get_activitys_project.cb(project)
       return project
 
-    @Pyro5.api.oneway
+    @async_method
     def get_default_activity(self, project):
       """
       This assumes a specific format for the project and activity names.
@@ -3728,7 +3777,7 @@ class DSSServer(Pyro5Server):
       self.get_default_activity.cb(activity)
       return activity
 
-    @Pyro5.api.oneway
+    @async_method
     def get_project_activities(self, project):
       """
       Get the activities associated with a project.

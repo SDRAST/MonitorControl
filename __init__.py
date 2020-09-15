@@ -940,8 +940,6 @@ class DeviceReadThread(threading.Thread):
     self.logger = mylogger
     self.actor = actor
     self.action = action
-    # if actor is 'self' then name will be generic 'Thread-xxx'
-    self.logger.debug("__init__: parent (actor) is %s", self.actor.name)
     self.end_flag=False
     self.thread_suspend=suspend
     self.sleep_time=0.0
@@ -950,12 +948,14 @@ class DeviceReadThread(threading.Thread):
     self.lock = threading.Lock()
     if name:
       self.name = name
-    else:
+    elif actor:
+      # if actor is 'self' then name will be generic 'Thread-xxx'
+      self.logger.debug("__init__: parent (actor) is %s", self.actor.name)
       try:
         self.name = self.actor.name
       except AttributeError:
         self.name = "actor"
-    self.logger.debug(" initialized thread %s", self.name)
+    self.logger.debug("__init__: initialized thread %s", self.name)
 
   def run(self):
     """
