@@ -15,7 +15,7 @@ __all__ = [
     "hdf5_data_dir",
     "fits_data_dir",
     "boresight_data_dir",
-    "flux_calibration_data_dir",
+    "tsys_calibration_data_dir",
     "tipping_data_dir",
     "status_dir",
     "sources_dir",
@@ -46,9 +46,9 @@ class TAMSConfiguration(object):
             self._calibration_dir,
             "boresight_data"
         )
-        self._flux_calibration_data_dir = os.path.join(
+        self._tsys_calibration_data_dir = os.path.join(
             self._calibration_dir,
-            "flux_calibration_data"
+            "tsys_calibration_data"
         )
         self._tipping_data_dir = os.path.join(
             self._calibration_dir,
@@ -88,8 +88,8 @@ class TAMSConfiguration(object):
         self._calibration_dir = path
         self.boresight_data_dir = os.path.join(
             self._calibration_dir, "boresight_data")
-        self.flux_calibration_data_dir = os.path.join(
-            self._calibration_dir, "flux_calibration_data")
+        self.tsys_calibration_data_dir = os.path.join(
+            self._calibration_dir, "tsys_calibration_data")
         self.tipping_data_dir = os.path.join(
             self._calibration_dir, "tipping_data")
         self.status_dir = os.path.join(
@@ -122,17 +122,5 @@ tams_config = Configuration(
     boresight_model_file = "AdaBoostClassifier.2018-07-05T09:17:31.dat",
     rest_freq=2.223508e10
 )
-#tams_config = Configuration(
-#    TAMSConfiguration,
-#    data_dir="/home/ops/roach_data/sao_test_data/RA_data",
-#    calibration_dir="/home/ops/roach_data/sao_test_data/data_dir",
-#    project_dir="/home/ops/projects/TAMS",
-#    log_dir="/usr/local/logs/dss43",
-#    product_dir="/home/ops/roach_data/sao_test_data/data_dir/products",
-#    boresight_model_file="AdaBoostClassifier.2018-07-05T09:17:31.dat",
-#    rest_freq=2.223508e10
-#)
-
-
 
 

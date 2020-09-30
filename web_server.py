@@ -35,9 +35,9 @@ default_level = logging.DEBUG
 
 module_levels = {
     "support": logging.WARNING,
-    "engineio": logging.WARNING,
-    "socketio": logging.WARNING,
-    "eventlet": logging.WARNING,
+    "engineio": logging.DEBUG,
+    "socketio": logging.DEBUG,
+    "eventlet": logging.DEBUG,
     "MonitorControl": logging.DEBUG,
     "MonitorControl.FrontEnds": logging.INFO,
     "MonitorControl.apps.postproc.util": logging.INFO
@@ -126,6 +126,8 @@ def generate_socketio(hardware={}):
         logger.debug("generate_socketio.hostname: host: {}".format(host))
 
     def teardown():
+        logger.debug("generate_socketio.teardown: disconnect at %s",
+                     datetime.datetime.now().ctime())
         server.save_info()
 
     socketio.on_event("init",       init)
