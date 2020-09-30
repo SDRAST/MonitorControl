@@ -96,7 +96,8 @@ is communicating with (simulated) hardware.::
            for PYRO:backend@localhost:50004;
            owner <greenlet.greenlet object at 0x7fe5f40e8cb0>>
 
-
+Clients are being developed for a GUI using Qt5.  A web-based client using
+Flask and Flask Socket IO are also being developed.
 
 Base Class Modules
 ==================
