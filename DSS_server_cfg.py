@@ -1,7 +1,16 @@
 """
 class to define the software parameters and a Configuration object for TAMS
 
-Also creates an instance of that class
+Also creates an instance of that class: `tams_config`.
+
+Notes
+=====
+This is a poor way to deal with various attributes used by DSSServer and the
+calibration classes.  As of now (2020-09-30) there are only two uses of object 
+in `DSSServer`.
+
+Originally, this also worked with an event emitter, which we may recover 
+sometime but is not urgently needed now.
 """
 import os
 

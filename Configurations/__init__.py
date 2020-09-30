@@ -14,6 +14,7 @@ http://deepspace.jpl.nasa.gov/dsndocs/810-005/302/302C.pdf
 
 Attachment to e-mail from Alina Bedrossian on 03/21/2017 at 09:16 AM gives 
 this assignment::
+
   Antenna Type	Switch	CDSCC	  GDSCC	  MDSCC
       BWG1	      1	    34_S1	  24_S1	  54_S1
 	              2	    34_X1	  26_S1	  54_X1

@@ -22,7 +22,7 @@ from flask import Flask
 from flask_socketio import SocketIO, emit
 
 from MonitorControl.DSS_server_cfg import tams_config
-from MonitorControl.dss_server2 import DSSServer
+from MonitorControl.dss_server import DSSServer
 from MonitorControl.Configurations  import station_configuration
 from support.arguments import initiate_option_parser
 from support.logs import setup_logging

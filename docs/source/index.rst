@@ -25,6 +25,7 @@ the gateway needs to be organized as a set of system servers using the same
 interface. 
 
 .. image:: overview.png
+
 In this diagram, each client has a subclass which is specific to the server to
 which it interfaces. The client subclasses which used for a particular observing
 session are defined in a Python function called ``configuration()``.  There
@@ -37,6 +38,7 @@ To achieve this there are three base superclasses.
 
 .. image:: baseClasses.png
    :width: 300
+   
 Each of the clients in the previous figure is a subclass of ``Device`` which
 operates on one or more ``Signal``\ objects that enter and leave *via*
 ``Port`` objects.

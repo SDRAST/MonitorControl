@@ -2,20 +2,22 @@
 """
 dss_server.py
 
-Provides class DSSServer, a configuration based master server for DSN antennae.
+Provides class DSSServer, a configuration-based master server for DSN antennae.
 
 If this is run as a standalone program then the appropriate environment should
 be activated.
 
-On crux pipenv is the environment manager.  /home/ops/dss-monitor-control has
-the correct environment.
+On crux ``pipenv`` is the environment manager. ``/home/ops/dss-monitor-control``
+has the correct environment.
 
-On host kuiper, conda is the environment manager:
-
+On host ``kuiper``, ``conda`` is the environment manager:
+```
   $ source activate DSSserver
+```
 
 Examples
 ========
+```
   $ python dss_server2.py --help
   usage: dss_server2.py [-h] [--verbose] [--simulated] [--flask] [--flaskio]
 
@@ -28,11 +30,12 @@ Examples
                      antenna hardware server.
     --flask, -f      Run server as flask server
     --flaskio, -fio  Run server as flask io server
-
+```
 Note that the Flask interface does not support callbacks in the server, that is,
 all callback handler trying to use a callback method to return data will fail.
 
 Example of session to test the server::
+```
   (DSSserver) kuiper@kuiper:~$ python
   >>> hardware = {"Antenna": False,"Receiver": False,"Backend": False,"FrontEnd": False}
   >>> from MonitorControl.Configurations  import station_configuration
@@ -82,7 +85,7 @@ Example of session to test the server::
   {'Backend': SAOspec "SAO spectrometer", 'FrontEnd': K_4ch "K",
    'IF_switch': IFswitch "Patch Panel",   'Antenna': DSN_Antenna "DSS-43",
    'Receiver': WBDC2 "WBDC-2"}
-
+```
 Notes
 =====
 The Flask client can make two sorts of calls on the server, with arguments and
@@ -90,9 +93,9 @@ without.  If no arguments are given, then the server method should have a normal
 ``return``.  If the client passes arguments, then the method should have a
 decorator ``@async_method`` and should return data to the client with callbacks
 with names like this:
-
+```
   servermethod.cb(data)
-
+```
 A decorated method can still have a normal ``return`` for when it is called
 from within the server program itself.
 """
@@ -123,34 +126,42 @@ import socket
 import signal
 import six
 
-from Pyro5.serializers import SerializerBase
-
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 module_logger = logging.getLogger(__name__)
 
 import Astronomy as A
-from Astronomy.Ephem import SerializableBody
-from Astronomy.redshift import V_LSR
+#from Astronomy.Ephem import SerializableBody
+import Astronomy.Ephem as Aeph
+#from Astronomy.redshift import V_LSR
+import Astronomy.redshift as Ared
 import Data_Reduction.boresights.boresight_manager as BSM
 import Data_Reduction.boresights.analyzer as BSA
-from Data_Reduction.FITS.DSNFITS import FITSfile
-from DatesTimes import UnixTime_to_datetime
-from MonitorControl import ActionThread, MonitorControlError
-from MonitorControl.DSS_server_cfg import tams_config # not really TAMS
-from MonitorControl.Configurations  import station_configuration
+import Data_Reduction.FITS.DSNFITS as DSNFITS
+#from Data_Reduction.FITS.DSNFITS import FITSfile
+import DatesTimes as DT
+#from DatesTimes import UnixTime_to_datetime
+import MonitorControl as MC
+#from MonitorControl import ActionThread, MonitorControlError
+import MonitorControl.DSS_server_cfg as DSScfg
+#from MonitorControl.DSS_server_cfg import tams_config # not really TAMS
+import MonitorControl.Configurations as MCcfg
+#from MonitorControl.Configurations  import station_configuration
 from MonitorControl.Configurations.GDSCC.WVSR  import station_configuration as std_configuration
 import MonitorControl.Configurations.projects as projcfg # project configuration
-from MonitorControl.Receivers.DSN import DSN_rx
-from Physics.Radiation.Lines.recomb_lines import recomb_freq
-from Radio_Astronomy.bands import frequency_to_band
-from support import hdf5_util
+import MonitorControl.Receivers.DSN as DSNrx
+#from MonitorControl.Receivers.DSN import DSN_rx
+import Physics.Radiation.Lines.recomb_lines as recomb
+#from Physics.Radiation.Lines.recomb_lines import recomb_freq
+import Radio_Astronomy.bands as bands
+#from Radio_Astronomy.bands import frequency_to_band
+import support
 from support.async_method import async_method
-from support.logs import setup_logging
-from support.pyro.pyro5_server import Pyro5Server
-from support.pyro.socket_error import register_socket_error
-from support.test import auto_test
-from support.text import make_title
+import support.logs # support.logs import setup_logging
+import support.flask_server # from support.flask_server import FlaskServer
+import support.pyro.socket_error # from support.pyro.socket_error import register_socket_error
+import support.test #from support.test import auto_test
+import support.text #from support.text import make_title
 
 from local_dirs import data_dir, proj_conf_path, projects_dir
 
@@ -165,8 +176,8 @@ def nowgmt():
 
 def logtime():
   return datetime.datetime.utcnow().strftime("%H:%M:%S.%f")[:-3]
-  
-register_socket_error()
+
+support.pyro.socket_error.register_socket_error()
 
 # temporary; need to construct from project, dss, and band
 configs = {
@@ -192,7 +203,7 @@ equinox = 2000
 restfreq = 22235.120 # H2O maser, MHz
 
 @Pyro5.api.expose
-class DSSServer(Pyro5Server):
+class DSSServer(support.flask_server.FlaskServer):
     """
     Server that integrates functionality from a DSS station's hardware configuration.
     Many calibration and observing routines rely on integrating monitor and control
@@ -452,7 +463,7 @@ class DSSServer(Pyro5Server):
         #self.backend.init_disk_monitors()
         #self.backend.observer.start() <<<<<<<<<<<<<< not working; maybe not needed
         #self.specQueue = queue.Queue()
-        self.specHandler = ActionThread(self, self.integr_done,
+        self.specHandler = MC.ActionThread(self, self.integr_done,
                                         name="specHandler")
         #self.specHandler = threading.Thread(target=self.integr_done,
         #                                    name="specHandler")
@@ -464,7 +475,7 @@ class DSSServer(Pyro5Server):
         """
         initialize a FITS file
         """
-        self.fitsfile = FITSfile(self.telescope)
+        self.fitsfile = DSNFITS.FITSfile(self.telescope)
         # initialize a list of extensions; the first is the primary
         self.HDUs = [self.fitsfile.prihdu] # FITS extensions
         # initialize a SDFITS binary table
@@ -499,7 +510,7 @@ class DSSServer(Pyro5Server):
         # adjust for X frontend and receiver
         self.logger.info("make_SAO_table: receiver is %s",
                          self.equipment['Receiver'])
-        if type(self.equipment['Receiver']) == DSN_rx:
+        if type(self.equipment['Receiver']) == DSNrx.DSN_rx:
           nbeams = 1
           self.logger.debug("init_binary_table: DSN receivers have one beam")
         else:
@@ -649,7 +660,8 @@ class DSSServer(Pyro5Server):
         if context in self.configs:
           # the usual way to get the configuration, accepting the defaults
           self.logger.debug("_config_hw: standard configuration")
-          observatory, equipment = station_configuration(context, **config_args)
+          observatory, equipment = MCcfg.station_configuration(context,
+                                                               **config_args)
         else:
           # if not a standard configuration, infer from context name like PSR014L
           self.logger.debug("_config_hw: non-standard configuration")
@@ -708,7 +720,7 @@ class DSSServer(Pyro5Server):
             },
             "boresight": {
                 "running": False,
-                "data_dir": tams_config.boresight_data_dir,
+                "data_dir": DSScfg.tams_config.boresight_data_dir,
                 "offset_el": 0.0,
                 "offset_xel": 0.0
             },
@@ -726,7 +738,7 @@ class DSSServer(Pyro5Server):
             },
             "tip": {
                 "running": False,
-                "data_dir": tams_config.tipping_data_dir,
+                "data_dir": DSScfg.tams_config.tipping_data_dir,
             },
             "project": {
                 "name": self.project,
@@ -772,7 +784,7 @@ class DSSServer(Pyro5Server):
             sub_path[path[-1]] = val
             self.set_info.cb() # no response to client
 
-    @auto_test()
+    @support.test.auto_test()
     @async_method
     def get_info(self, path=None):
         """
@@ -804,7 +816,7 @@ class DSSServer(Pyro5Server):
             self.get_info.cb(sub_path) # send client the requested data
             return sub_path
 
-    @auto_test()
+    @support.test.auto_test()
     def save_info(self):
         """
         Dump internal _info attribute to a file.
@@ -828,7 +840,7 @@ class DSSServer(Pyro5Server):
                 time.time() - t0))
 
 
-    @auto_test()
+    @support.test.auto_test()
     def load_info(self):
         """
         Load in _info attribute from most recently dumped settings file.
@@ -977,7 +989,7 @@ class DSSServer(Pyro5Server):
         self.logger.debug("hdwr({}): {} method '{}' called".format(
                                                   logtime(), hdwr, method_name))
         if hdwr not in self.equipment:
-            raise MonitorControlError([], "Couldn't find {} in equipment".format(hdwr))
+            raise MC.MonitorControlError([], "Couldn't find {} in equipment".format(hdwr))
         elif self.equipment[hdwr].hardware == False:
           result = self.emulate(hdwr, method_name)
         else:
@@ -994,12 +1006,12 @@ class DSSServer(Pyro5Server):
                 result = method # accessing an attribute
               self.logger.debug("hdwr: result: %s", result)
           except AttributeError as err:
-            raise MonitorControlError([],
+            raise MC.MonitorControlError([],
                      "Couldn't find method {} for {}".format(method_name, hdwr))
         try:
           self.parse_result(result)
         except Exception as details:
-          raise MonitorControlError([], "parsing {} failed".format(result))
+          raise MC.MonitorControlError([], "parsing {} failed".format(result))
         self.hdwr.cb(result) # send client the result
         return result
 
@@ -1067,7 +1079,7 @@ class DSSServer(Pyro5Server):
       else:
         self.logger.info('parse_result: %s', result)
 
-    @auto_test()
+    @support.test.auto_test()
     def list_hdwr(self):
         """List available hardware, or the keys of ``equipment`` attribute"""
         self.logger.debug("list_hdwr: Called.")
@@ -1239,10 +1251,11 @@ class DSSServer(Pyro5Server):
                   elif "freq" in self.info["verifiers"][name]:
                     freq = self.info["verifiers"][name]["freq"]/1000.     # GHz
                   elif "N" in self.info["verifiers"][name]:
-                    freq = recomb_freq(self.info["verifiers"][name]['N'],1,1,'H')
+                    freq = recomb.recomb_freq(
+                                      self.info["verifiers"][name]['N'],1,1,'H')
                   else:
                     freq = self.equipment['FrontEnd']['frequency']
-                  band = frequency_to_band(freq)
+                  band = bands.frequency_to_band(freq)
                   flux = self.info["verifiers"][name]["flux"]
                   self.info["verifiers"][name]["flux"] = {band: flux}
               else:
@@ -1259,7 +1272,7 @@ class DSSServer(Pyro5Server):
               # a flux.
               # What we do need is a frequency to get the right flux
               freq = self.equipment['FrontEnd']['frequency']
-              band = frequency_to_band(freq)
+              band = bands.frequency_to_band(freq)
               flux = self.info["calibrators"][name]["flux"]
               self.info["calibrators"][name]["flux"] = {band: flux}
               this_source = self.info["calibrators"][name]
@@ -1296,12 +1309,12 @@ class DSSServer(Pyro5Server):
 
             # label for styles parameter 'class'
             if len(sourcedata["category"]) == 1: # e.g.'calibrators','known masers'
-              label = make_title(sourcedata["category"][0])+"s"
+              label = support.text.make_title(sourcedata["category"][0])+"s"
             elif len(sourcedata["category"]) == 2: # e.g.['catalog','priority 1']
               if sourcedata["category"][0] == "catalog":
-                label = make_title(sourcedata["category"][1])
+                label = support.text.make_title(sourcedata["category"][1])
               else:                             # e.g. ['known', 'HII']
-                label = make_title(sourcedata["category"][1])+"s"
+                label = support.text.make_title(sourcedata["category"][1])+"s"
             else:
               label = " ".join(sourcedata["category"]) # weird unexpected case
             sourcedata['label'] = label
@@ -1314,7 +1327,7 @@ class DSSServer(Pyro5Server):
             # styles parameter 'r'
             def radius():
               freq = self.equipment['FrontEnd']['frequency']
-              band = frequency_to_band(freq)
+              band = bands.frequency_to_band(freq)
               try:
                 flux = float(sourcedata['flux'][band])
               except KeyError:
@@ -1381,7 +1394,7 @@ class DSSServer(Pyro5Server):
             #self.logger.debug("get_sources_data: %s info: %s", source_name, source_info)
             if source_info is not None:
                 # extends ephem.FixedBody with methods to_dict() and from_dict()
-                b = SerializableBody()
+                b = Aeph.SerializableBody()
                 try:
                   b._ra = source_info["ra"]
                 except KeyError:
@@ -1558,7 +1571,7 @@ class DSSServer(Pyro5Server):
             source_info = get_source(source_name)
             if source_info is not None:
                 # extends ephem.FixedBody with methods to_dict() and from_dict()
-                b = SerializableBody()
+                b = Aeph.SerializableBody()
                 b._ra = source_info["ra"]
                 b._dec = source_info["dec"]
                 b.name = source_name
@@ -1694,7 +1707,7 @@ class DSSServer(Pyro5Server):
     def _get_src_info_dict(self, src_dict):
         self.logger.debug(
             "_get_src_info_dict: src_dict: {}".format(src_dict))
-        src_obj = SerializableBody.from_dict(src_dict)
+        src_obj = Aeph.SerializableBody.from_dict(src_dict)
         self.logger.debug(
             ("_get_src_info_dict: "
              "adding source info for source {} to file").format(src_obj.name))
@@ -1729,7 +1742,7 @@ class DSSServer(Pyro5Server):
 
     # ------------------------- Observatory Details ---------------------------
 
-    @auto_test()
+    @support.test.auto_test()
     def _get_observer_info_dict(self):
         """
         Get a dictionary with current observer information.
@@ -1774,7 +1787,7 @@ class DSSServer(Pyro5Server):
                        float(src["el"])*convert)
 
             self.logger.error(msg)
-            raise MonitorControlError([], msg)
+            raise MC.MonitorControlError([], msg)
         self.info["point"]["current_source"] = src
         resp = self.hdwr("Antenna", "point_radec", src["_ra"], src["_dec"])
         self.logger.debug("point: resp from Antenna: {}".format(resp))
@@ -3024,7 +3037,7 @@ class DSSServer(Pyro5Server):
 
     # --------------------------------- Data Acquisition ----------------------
 
-    @auto_test()
+    @support.test.auto_test()
     def get_tsys(self, timestamp=False):
         """
         Get system temperature, in units of Kelvin, i.e. power meter readings
@@ -3555,7 +3568,7 @@ class DSSServer(Pyro5Server):
         #astrotime = astropy.time.Time(UNIXtime, format='unix', scale='utc',
         #                              location=self.location)
         #astrotime.delta_ut1_utc = 0 # forget about fraction of second and IERS
-        astrotime = UnixTime_to_datetime(UNIXtime)
+        astrotime = DT.UnixTime_to_datetime(UNIXtime)
         self.bintabHDU.data[index]['LST'][0,record,0,0,0,0] = (
           A.greenwich_sidereal_time(
                     now.tm_year, now.tm_yday + (now.tm_hour+now.tm_min/60.)/24.
@@ -3563,7 +3576,7 @@ class DSSServer(Pyro5Server):
                   - self.location.lon.hour
           ) % 24
         self.bintabHDU.data[index]['VFRAME'] = \
-                     V_LSR(self.RA, self.dec, self.telescope.number, astrotime)
+                 Ared.V_LSR(self.RA, self.dec, self.telescope.number, astrotime)
         self.bintabHDU.data[index]['RVSYS'] = \
                                        self.bintabHDU.data[index]['VELOCITY'] \
                                      - self.bintabHDU.data[index]['VFRAME']
@@ -3810,12 +3823,12 @@ class DSSServer(Pyro5Server):
       self.logger.debug("change_project: activity is %s", self.activity)
       if context:
         if context in list(self.get_configs().keys()):
-          observatory, equipment = station_configuration(context)
+          observatory, equipment = MCcfg.station_configuration(context)
       else:
         context = configs[self.project][self.activity]
         self.logger.debug("change_project: context is %s", context)
         if context in list(self.get_configs().keys()):
-          observatory, equipment = station_configuration(context)
+          observatory, equipment = MCcfg.station_configuration(context)
         else:
           # assume a form AAAADDB
           activity = context[:4]
@@ -3911,7 +3924,7 @@ if __name__ == "__main__":
     level = logging.DEBUG
     if not parsed.verbose:
         level = logging.INFO
-    mylogger = setup_logging(logLevel=level)
+    mylogger = support.logs.setup_logging(logLevel=level)
 
     logging.getLogger("support").setLevel(logging.DEBUG)
 

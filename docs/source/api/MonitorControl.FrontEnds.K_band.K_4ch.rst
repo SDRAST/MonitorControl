@@ -12,6 +12,7 @@ K_4ch
 
       ~K_4ch.Tsys_vacuum
       ~K_4ch.feed_states
+      ~K_4ch.future__getattr__
       ~K_4ch.get_ND_state
       ~K_4ch.read_PMs
       ~K_4ch.read_temps
@@ -27,6 +28,7 @@ K_4ch
 
    .. automethod:: Tsys_vacuum
    .. automethod:: feed_states
+   .. automethod:: future__getattr__
    .. automethod:: get_ND_state
    .. automethod:: read_PMs
    .. automethod:: read_temps

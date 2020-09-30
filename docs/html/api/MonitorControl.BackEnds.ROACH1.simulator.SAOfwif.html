@@ -48,11 +48,11 @@
 <h1>SAOfwif<a class="headerlink" href="#saofwif" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif">
-<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.ROACH1.simulator.</code><code class="sig-name descname">SAOfwif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach</span><span class="o">=</span><span class="default_value">'roach1'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'sao'</span></em>, <em class="sig-param"><span class="n">firmware_server</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">firmware_key</span><span class="o">=</span><span class="default_value">'sao_spec'</span></em>, <em class="sig-param"><span class="n">port</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach_log_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">clock_synth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">integr_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">writer_queue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">write_to_disk</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">TAMS_logging</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">timing_report</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">MonitorControl.BackEnds.ROACH1.simulator.</code><code class="sig-name descname">SAOfwif</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach</span><span class="o">=</span><span class="default_value">'roach1'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'sao'</span></em>, <em class="sig-param"><span class="n">firmware_server</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">firmware_key</span><span class="o">=</span><span class="default_value">'sao_spec'</span></em>, <em class="sig-param"><span class="n">port</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">roach_log_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">clock_synth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">integr_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">write_to_disk</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">TAMS_logging</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">timing_report</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.DeviceReadThread</span></code></a></p>
 <p>Class for one ROACH with SAO 32K spectrometer firmware</p>
 <p>Attributes:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">acc_count</span> <span class="o">-</span> <span class="n">current</span> <span class="n">accumulation</span> <span class="n">number</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum_count</span> <span class="o">-</span> <span class="n">current</span> <span class="n">accumulation</span> <span class="n">number</span>
 <span class="n">gains</span>     <span class="o">-</span> <span class="n">RF</span> <span class="n">gain</span> <span class="p">(</span><span class="n">only</span> <span class="mi">1</span> <span class="n">ADC</span> <span class="ow">and</span> <span class="mi">1</span> <span class="n">RF</span> <span class="nb">input</span><span class="p">)</span>
 <span class="n">data_file_obj</span>  <span class="o">-</span> <span class="n">where</span> <span class="n">raw</span> <span class="n">data</span> <span class="n">are</span> <span class="n">stored</span>
 <span class="n">logger</span>    <span class="o">-</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="n">instance</span>
@@ -305,22 +305,18 @@ incrementing until the spectrometer is reset.</p>
 <dl class="py method">
 <dt id="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum">
 <code class="sig-name descname">get_next_spectrum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.get_next_spectrum" title="Permalink to this definition">¶</a></dt>
-<dd><dl>
-<dt>Suggested by Jonathan::</dt><dd><p>acc_new = fpga.read(acc_cnt)
-if acc_new == acc_old</p>
-<blockquote>
-<div><p>do nothing</p>
-</div></blockquote>
-<dl class="simple">
-<dt>else if  acc_new == acc_old + 1</dt><dd><p>read_bram
-acc_old = acc_new</p>
-</dd>
-<dt>else</dt><dd><p>missed an accumulation, throw an error</p>
-</dd>
-</dl>
-<p>end</p>
-</dd>
-</dl>
+<dd><p>Suggested by Jonathan:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">acc_new</span> <span class="o">=</span> <span class="n">fpga</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">acc_cnt</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">acc_new</span> <span class="o">==</span> <span class="n">acc_old</span>
+    <span class="n">do</span> <span class="n">nothing</span>
+<span class="k">else</span> <span class="k">if</span>  <span class="n">acc_new</span> <span class="o">==</span> <span class="n">acc_old</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="n">read_bram</span>
+  <span class="n">acc_old</span> <span class="o">=</span> <span class="n">acc_new</span>
+<span class="k">else</span>
+  <span class="n">missed</span> <span class="n">an</span> <span class="n">accumulation</span><span class="p">,</span> <span class="n">throw</span> <span class="n">an</span> <span class="n">error</span>
+<span class="n">end</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">

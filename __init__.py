@@ -1034,7 +1034,7 @@ def ClassInstance(templateClass, subclass, *args, **kwargs):
     different languages.'
     
     Arguments
-    ---------
+    =========
     The subclass must provide the template with all the arguments that it
     requires.
 

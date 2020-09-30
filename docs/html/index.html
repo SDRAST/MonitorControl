@@ -483,7 +483,7 @@ this assignment:</p>
 </div>
 <div class="section" id="module-MonitorControl.FrontEnds.K_band">
 <span id="monitorcontrol-frontends-k-band-package"></span><h2>MonitorControl.FrontEnds.K_band Package<a class="headerlink" href="#module-MonitorControl.FrontEnds.K_band" title="Permalink to this headline">¶</a></h2>
-<p>K_4ch - module for K_4ch front end class</p>
+<p>K_4ch - client module for K_4ch front end class</p>
 <p>This provides a superclass with code common to both WBDC versions</p>
 <p>sub-package implements control and monitoring of the
 K-band front end using a LabJack</p>
@@ -529,26 +529,8 @@ K-band front end using a LabJack</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Beam</span></code>(name)</p></td>
-<td><p>Signal class for radiation arriving at a feed.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComplexSignal</span></code>(parent_signal[, pol, name])</p></td>
-<td><p>ComplexSignal class for an RF output from an orthomode or polarizer.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrontEnd</span></code>(name[, inputs, output_names, active])</p></td>
-<td><p>Device which converts EM radiation to electrical signals.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.FrontEnds.K_band.K_4ch.html#MonitorControl.FrontEnds.K_band.K_4ch" title="MonitorControl.FrontEnds.K_band.K_4ch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">K_4ch</span></code></a>(name[, inputs, output_names, hardware])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.FrontEnds.K_band.K_4ch.html#MonitorControl.FrontEnds.K_band.K_4ch" title="MonitorControl.FrontEnds.K_band.K_4ch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">K_4ch</span></code></a>(name[, inputs, output_names, hardware])</p></td>
 <td><p>The 4-channel downconverter with four inputs for two pols and two feeds.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MonitorControlError</span></code>(args, message)</p></td>
-<td><p>Error handler for this module</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Port</span></code>(parent, name[, source, signal])</p></td>
-<td><p>Class for a signal port in an Device.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">auto_test</span></code>([args, kwargs, returns])</p></td>
-<td><p>This decorator is intended to be used in conjunction with the AutoTestSuite or Pyro4AutoTestSuite class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -630,32 +612,8 @@ convention used, specifically, the length of the names.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Device</span></code>(name[, inputs, output_names, active, …])</p></td>
-<td><p>Superclass for anything that receives, processes and outputs a signal.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IF</span></code>(parent[, IF_type])</p></td>
-<td><p>Electrical signal out of a receiver, suitable for detection or digitization.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MonitorControlError</span></code>(args, message)</p></td>
-<td><p>Error handler for this module</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></p></td>
-<td><p>Dictionary that remembers insertion order</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Port</span></code>(parent, name[, source, signal])</p></td>
-<td><p>Class for a signal port in an Device.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Receiver</span></code>(name[, inputs, output_names, active])</p></td>
-<td><p>Device which converts RF signals to IF signals for detection or digitization</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Switch</span></code>(name[, inputs, output_names, stype, …])</p></td>
-<td><p>Three basic switch types are recognized: “1xN”, “Nx1” and “2x2”.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.Receivers.WBDC.WBDC_base.html#MonitorControl.Receivers.WBDC.WBDC_base" title="MonitorControl.Receivers.WBDC.WBDC_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WBDC_base</span></code></a>(name[, inputs, output_names, active])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.Receivers.WBDC.WBDC_base.html#MonitorControl.Receivers.WBDC.WBDC_base" title="MonitorControl.Receivers.WBDC.WBDC_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WBDC_base</span></code></a>(name[, inputs, output_names, active])</p></td>
 <td><p>Base class for a DSN K-band wideband down-converter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">auto_test</span></code>([args, kwargs, returns])</p></td>
-<td><p>This decorator is intended to be used in conjunction with the AutoTestSuite or Pyro4AutoTestSuite class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -719,7 +677,11 @@ convention used, specifically, the length of the names.</p>
 </div>
 <div class="section" id="module-MonitorControl.BackEnds.ROACH1.SAOclient">
 <span id="monitorcontrol-backends-roach1-saoclient-module"></span><h2>MonitorControl.BackEnds.ROACH1.SAOclient Module<a class="headerlink" href="#module-MonitorControl.BackEnds.ROACH1.SAOclient" title="Permalink to this headline">¶</a></h2>
-<p>Python support for ROACH1 firmware</p>
+<p>Python Pyro client for ROACH1 firmware</p>
+<p class="rubric">Notes</p>
+<p>This works with a Pyro5 server for ROACH1.  It’s relatively independent of the
+firmware on the ROACH1. There is a server simulator derived from the hardware
+server for the 32K 1000MHz spectrometer firmware.</p>
 <div class="section" id="id26">
 <h3>Classes<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
@@ -728,38 +690,32 @@ convention used, specifically, the length of the names.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionThread</span></code></p></td>
-<td><p>alias of <a class="reference internal" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" title="MonitorControl.DeviceReadThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonitorControl.DeviceReadThread</span></code></a></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backend</span></code>(name[, inputs, output_names, …])</p></td>
-<td><p>Defines the Backend class, some assembly of DSP hardware.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.html#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" title="MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOclient</span></code></a>(name[, inputs, output_names, hardware])</p></td>
-<td><p>SAO 32K-channel spectrometer</p></td>
+<td><p>SAO 32K-channel spectrometer client</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="id27">
 <h3>Class Inheritance Diagram<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
-<div class="graphviz"><img src="_images/inheritance-78fbaca8bb893740ce86a29587ee1983c99bcd62.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" usemap="#inheritanceaa15f8ce27" class="inheritance graphviz" /></div>
+<div class="graphviz"><img src="_images/inheritance-29b60d9196c2d46c1cb715f249d54c51cc1b524c.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" usemap="#inheritanceaa15f8ce27" class="inheritance graphviz" /></div>
 <map id="inheritanceaa15f8ce27" name="inheritanceaa15f8ce27">
 <area shape="rect" id="node1" href="api/MonitorControl.BackEnds.Backend.html#MonitorControl.BackEnds.Backend" target="_top" title="Defines the Backend class, some assembly of DSP hardware." alt="" coords="125,5,204,31"/>
-<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.html#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" target="_top" title="SAO 32K&#45;channel spectrometer" alt="" coords="252,5,337,31"/>
+<area shape="rect" id="node3" href="api/MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient.html#MonitorControl.BackEnds.ROACH1.SAOclient.SAOclient" target="_top" title="SAO 32K&#45;channel spectrometer client" alt="" coords="252,5,337,31"/>
 <area shape="rect" id="node2" href="api/MonitorControl.Device.html#MonitorControl.Device" target="_top" title="Superclass for anything that receives, processes and outputs a signal." alt="" coords="5,5,77,31"/>
 </map></div>
 </div>
 <div class="section" id="module-MonitorControl.BackEnds.ROACH1.simulator">
 <span id="monitorcontrol-backends-roach1-simulator-module"></span><h2>MonitorControl.BackEnds.ROACH1.simulator Module<a class="headerlink" href="#module-MonitorControl.BackEnds.ROACH1.simulator" title="Permalink to this headline">¶</a></h2>
 <p>This simulates a multi-ROACH backend using the TAMS firmare.</p>
-<p>The basic program behavior is to create a ‘SAObackend’ object.  This is the
-parent for ‘SAOfwif’ (SAO firmware interface) objects, one for each ROACH. The
-‘SAOfwif’ class is a subclass of the ‘DeviceReadThread’ class.</p>
-<p>Each ‘SAOfwif’ object has one or more ‘Channel’ objects (one for ROACH1, four
-for ROACH2) which convert IF signals into 32K power spectra.</p>
-<p>Because conversion to 4-channel firmware is pending, a number of ‘SAOfwif’
-methods should be eventually converted to ‘SAOfwif.Channel’ methods.</p>
-<p>Each ‘SAOfwif’ object initializes its channel(s) and simulates the ROACH’s
+<p>The basic program behavior is to create a <code class="docutils literal notranslate"><span class="pre">SAObackend</span></code> object.  This is the
+parent for <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> (SAO firmware interface) objects, one for each ROACH. The
+<code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> class is a subclass of the <code class="docutils literal notranslate"><span class="pre">DeviceReadThread</span></code> class.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> object has one or more <code class="docutils literal notranslate"><span class="pre">Channel</span></code> objects (one for ROACH1,
+four for ROACH2) which convert IF signals into 32K power spectra.</p>
+<p>Because conversion to 4-channel firmware is pending, a number of <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code>
+methods should be eventually converted to <code class="docutils literal notranslate"><span class="pre">SAOfwif.Channel</span></code> methods.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> object initializes its channel(s) and simulates the ROACH’s
 firmware initialization which consists of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">FFT</span> <span class="n">shift</span> <span class="n">register</span><span class="p">,</span>
 <span class="o">*</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">gain</span> <span class="n">of</span> <span class="n">the</span> <span class="n">RF</span> <span class="n">sections</span> <span class="n">of</span> <span class="n">the</span> <span class="n">ADC</span> <span class="n">channels</span><span class="p">,</span>
@@ -770,67 +726,54 @@ firmware initialization which consists of:</p>
 <span class="o">*</span> <span class="n">sets</span> <span class="n">the</span> <span class="n">scan</span> <span class="n">number</span> <span class="n">to</span> <span class="mf">1.</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>The ‘SAObackend’ method ‘start’ is invoked by a client. For each ROACH it::</dt><dd><ul class="simple">
-<li><p>resumes the thread,</p></li>
-<li><p>invokes the client’s callback handler to provide the start time,</p></li>
-<li><p>sets the accumulation time to zero.</p></li>
-</ul>
-</dd>
-</dl>
-<p>The ‘SAOfwif’ method ‘action’ increments the number of accumulations and
+<p>The <code class="docutils literal notranslate"><span class="pre">SAObackend'``method</span> <span class="pre">``start()</span></code> is invoked by a client. For each ROACH it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">resumes</span> <span class="n">the</span> <span class="n">thread</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">invokes</span> <span class="n">the</span> <span class="n">client</span><span class="s1">&#39;s callback handler to provide the start time,</span>
+<span class="o">*</span> <span class="n">sets</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">accumulated</span> <span class="n">spectra</span> <span class="n">to</span> <span class="n">zero</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> method <code class="docutils literal notranslate"><span class="pre">action()</span></code> increments the number of accumulations and
 checks to see if it exceeds exceeds the specified number of accumulations for
 a scan.  If not it:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">waits</span> <span class="k">for</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="n">to</span> <span class="n">be</span> <span class="n">completed</span><span class="p">,</span>
-<span class="o">*</span> <span class="n">invokes</span> <span class="n">the</span> <span class="n">callback</span> <span class="n">to</span> <span class="n">tell</span> <span class="n">the</span> <span class="n">client</span> <span class="n">that</span> <span class="n">a</span> <span class="n">new</span> <span class="n">accumulation</span> <span class="ow">is</span> <span class="n">done</span>
-<span class="o">*</span> <span class="n">writes</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="p">(</span><span class="n">spectrum</span><span class="p">)</span> <span class="n">to</span> <span class="n">the</span> <span class="n">datafile</span><span class="o">.</span>
+<span class="o">*</span> <span class="n">puts</span> <span class="n">the</span> <span class="n">accumulation</span> <span class="p">(</span><span class="n">spectrum</span><span class="p">)</span> <span class="n">on</span> <span class="n">the</span> <span class="n">combiner</span> <span class="n">queue</span><span class="o">.</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>If the number of accumulations exceeds the specified maximum it::</dt><dd><ul class="simple">
-<li><p>invokes the callback to say that a scan is finished,</p></li>
-<li><p>suspends the threat,</p></li>
-<li><p>sets the number of accumulations to 0,</p></li>
-<li><p>increments the scan number.</p></li>
-</ul>
-</dd>
-</dl>
-<p>Note therefore that a ‘scan’ consists of some specified number of accumulations
+<p>If the number of accumulations exceeds the specified maximum it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">suspends</span> <span class="n">the</span> <span class="n">threat</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">sets</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">accumulations</span> <span class="n">to</span> <span class="mi">0</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">increments</span> <span class="n">the</span> <span class="n">scan</span> <span class="n">number</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Note therefore that a scan consists of some specified number of accumulations
 (integrations) each of which is written as a record, that is, as a row in a 2D
 numpy array.  It is the job of the client to start a new scan which resumes the
 thread.</p>
 <p><em>Scan and Record Numbers</em></p>
-<p>Scan and record numbers are both three digit strings starting with ‘000’. These
-are used as names for the groups in the HDF5 hierarchy.  Each ROACH has its own
-copy of the scan number. Record numbers are initialized to 0 when the SAOfwif
-object is created.  The scan numbers are updated in the SAObackend action()
-method when a scan is completed. (It’s better to think of action() as a method
-which the SAOfwif parent provides.)</p>
+<p>Scan and record numbers are integers or three digit strings starting with “001”.
+Each ROACH has its own copy of the scan number.</p>
+<p>Record numbers are initialized to 0 when the SAOfwif object is created. It is
+incremented each time <code class="docutils literal notranslate"><span class="pre">action()</span></code> is entered.</p>
+<p>Scan numbers are initialized as 0.  The The scan numbers are updated in the
+<code class="docutils literal notranslate"><span class="pre">SAObackend</span></code> method <code class="docutils literal notranslate"><span class="pre">action()</span></code> when a scan is completed. (It’s better to
+think of <code class="docutils literal notranslate"><span class="pre">action()</span></code> as an <code class="docutils literal notranslate"><span class="pre">SAOfwif</span></code> method provided by the parent
+<code class="docutils literal notranslate"><span class="pre">SAObackend</span></code>.)</p>
 <p><em>Metadata</em></p>
 <p>The SAOfwif object creates an HDF5 file when it is initialised. The firmware
 register data which do not change are attrs of the top level of the HDF5
-hierarchy. The SAObackend method ‘start(N)’ will start a new scan of N records
+hierarchy. The SAObackend method <code class="docutils literal notranslate"><span class="pre">start(N)</span></code> will start a new scan of N records
 for each ROACH. Scans are at the second level of the HDF5 hierarchy. The attrs
 of the scan level of the file are those firmware registers which do not change
 during a scan. Each record is written to disk as it is acquired. The attrs of
 the record level are the register values which change all the time, and also
-‘time’ in seconds.</p>
+time in seconds.</p>
 <p class="rubric">Example</p>
-<p>from MonitorControl.BackEnds.ROACH1.SAOfwif import SAObackend
-be = SAObackend(“SAO spectrometer”,</p>
-<blockquote>
-<div><p>roachlist=[“sao64k-1”, “sao64k-2”, “sao64k-3”, “sao64k-4”])</p>
-</div></blockquote>
-<p>roach = {}
-outfile = {}
-current_scan = be.roach[“sao64k-4”].scan
-for key in [1,2,3,4]:</p>
-<blockquote>
-<div><p>outfile[key] = open(“/var/tmp/sao64k-“+str(key)+”.txt”, “w”)
-roach[key] = be.roach[‘sao64k-‘+str(key)]
-roach[key].start_recording(acc_time=5)
-roach[key].resume_thread()</p>
-</div></blockquote>
+<p>Creating a backend server at the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">MonitorControl.BackEnds.ROACH1.SAOfwif</span> <span class="kn">import</span> <span class="n">SAObackend</span>
+<span class="n">be</span> <span class="o">=</span> <span class="n">SAObackend</span><span class="p">(</span><span class="s2">&quot;SAO spectrometer&quot;</span><span class="p">,</span>
+                <span class="n">roachlist</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sao64k-1&quot;</span><span class="p">,</span> <span class="s2">&quot;sao64k-2&quot;</span><span class="p">,</span> <span class="s2">&quot;sao64k-3&quot;</span><span class="p">,</span> <span class="s2">&quot;sao64k-4&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
 <div class="section" id="id28">
 <h3>Functions<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
@@ -842,8 +785,14 @@ roach[key].resume_thread()</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser.html#MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser" title="MonitorControl.BackEnds.ROACH1.simulator.create_arg_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_arg_parser</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.main.html#MonitorControl.BackEnds.ROACH1.simulator.main" title="MonitorControl.BackEnds.ROACH1.simulator.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>(server_cls)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.logtime.html#MonitorControl.BackEnds.ROACH1.simulator.logtime" title="MonitorControl.BackEnds.ROACH1.simulator.logtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logtime</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.main.html#MonitorControl.BackEnds.ROACH1.simulator.main" title="MonitorControl.BackEnds.ROACH1.simulator.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>(server_cls)</p></td>
 <td><p>starts logging, creates a server_cls object, launches the server object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.nowgmt.html#MonitorControl.BackEnds.ROACH1.simulator.nowgmt" title="MonitorControl.BackEnds.ROACH1.simulator.nowgmt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nowgmt</span></code></a>()</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -856,13 +805,16 @@ roach[key].resume_thread()</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAObackend</span></code></a>(name[, roaches, roachlist, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner.html#MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner" title="MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RoachCombiner</span></code></a>([parent, dsplist])</p></td>
+<td><p>subclass with meaningful <code class="docutils literal notranslate"><span class="pre">process_data</span></code> method</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" title="MonitorControl.BackEnds.ROACH1.simulator.SAObackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAObackend</span></code></a>(name[, roaches, roachlist, …])</p></td>
 <td><p>A simulated multi-ROACH 32k-channel x 4-IF spectrometer</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOfwif</span></code></a>([parent, roach, template, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" title="MonitorControl.BackEnds.ROACH1.simulator.SAOfwif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOfwif</span></code></a>([parent, roach, template, …])</p></td>
 <td><p>Class for one ROACH with SAO 32K spectrometer firmware</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" title="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOspecServer</span></code></a>(name[, roachlist, logpath, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" title="MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAOspecServer</span></code></a>(name[, roachlist, logpath, …])</p></td>
 <td><p>Pyro server for the SAO back end</p></td>
 </tr>
 </tbody>
@@ -870,12 +822,13 @@ roach[key].resume_thread()</p>
 </div>
 <div class="section" id="id30">
 <h3>Class Inheritance Diagram<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
-<div class="graphviz"><img src="_images/inheritance-126d39edef2d49dae8e40ee53d8ddf74ca8adee3.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.simulator.SAObackend, MonitorControl.BackEnds.ROACH1.simulator.SAOfwif, MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" usemap="#inheritancece3b90ffc7" class="inheritance graphviz" /></div>
-<map id="inheritancece3b90ffc7" name="inheritancece3b90ffc7">
-<area shape="rect" id="node1" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="157,104,301,129"/>
-<area shape="rect" id="node7" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" target="_top" title="Class for one ROACH with SAO 32K spectrometer firmware" alt="" coords="364,104,439,129"/>
-<area shape="rect" id="node6" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" target="_top" title="A simulated multi&#45;ROACH 32k&#45;channel x 4&#45;IF spectrometer" alt="" coords="349,5,453,31"/>
-<area shape="rect" id="node8" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" target="_top" title="Pyro server for the SAO back end" alt="" coords="501,31,623,56"/>
+<div class="graphviz"><img src="_images/inheritance-896dd47bef8085f871446f1e5eec76c96f040d7b.png" alt="Inheritance diagram of MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner, MonitorControl.BackEnds.ROACH1.simulator.SAObackend, MonitorControl.BackEnds.ROACH1.simulator.SAOfwif, MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" usemap="#inheritancef4fc9fbbc7" class="inheritance graphviz" /></div>
+<map id="inheritancef4fc9fbbc7" name="inheritancef4fc9fbbc7">
+<area shape="rect" id="node7" href="api/MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner.html#MonitorControl.BackEnds.ROACH1.simulator.RoachCombiner" target="_top" title="subclass with meaningful ``process_data`` method" alt="" coords="513,116,637,141"/>
+<area shape="rect" id="node2" href="api/MonitorControl.DeviceReadThread.html#MonitorControl.DeviceReadThread" target="_top" title="One thread in a multi&#45;threaded, multiple device instrument" alt="" coords="157,140,301,165"/>
+<area shape="rect" id="node9" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOfwif.html#MonitorControl.BackEnds.ROACH1.simulator.SAOfwif" target="_top" title="Class for one ROACH with SAO 32K spectrometer firmware" alt="" coords="370,165,445,191"/>
+<area shape="rect" id="node8" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAObackend.html#MonitorControl.BackEnds.ROACH1.simulator.SAObackend" target="_top" title="A simulated multi&#45;ROACH 32k&#45;channel x 4&#45;IF spectrometer" alt="" coords="355,5,459,31"/>
+<area shape="rect" id="node10" href="api/MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer.html#MonitorControl.BackEnds.ROACH1.simulator.SAOspecServer" target="_top" title="Pyro server for the SAO back end" alt="" coords="515,43,636,68"/>
 </map></div>
 </div>
 <div class="section" id="configurations">
@@ -936,27 +889,21 @@ if more IFs become available, simply replacing the appropriate 0 with the input
 number. If there is no key, that IF does not exist.</p>
 <p class="rubric">References</p>
 <p><a class="reference external" href="http://deepspace.jpl.nasa.gov/dsndocs/810-005/302/302C.pdf">http://deepspace.jpl.nasa.gov/dsndocs/810-005/302/302C.pdf</a></p>
-<dl>
-<dt>The following are from cable tracing and table from Larry (DVP-DTO.jpg)::</dt><dd><p>24SR  -&gt; J1A  -&gt;  2
-14SR  -&gt; J2A  -&gt;  4</p>
-<blockquote>
-<div><p>-&gt; J3A  -&gt;
--&gt; J4A  -&gt;  8
--&gt; J5A  -&gt; 10
--&gt; J6A  -&gt;  6</p>
-</div></blockquote>
-<p>26XR  -&gt; J7A  -&gt; 18
-26KaR -&gt; J8A  -&gt; 20</p>
-<blockquote>
-<div><p>-&gt; J9A  -&gt;</p>
-</div></blockquote>
-<dl class="simple">
-<dt>14XR  -&gt; J10A -&gt;</dt><dd><p>-&gt; J11A -&gt;
--&gt; J12A -&gt; 24</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<p>The following are from cable tracing and table from Larry (DVP-DTO.jpg):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">24</span><span class="n">SR</span>  <span class="o">-&gt;</span> <span class="n">J1A</span>  <span class="o">-&gt;</span>  <span class="mi">2</span>
+<span class="mi">14</span><span class="n">SR</span>  <span class="o">-&gt;</span> <span class="n">J2A</span>  <span class="o">-&gt;</span>  <span class="mi">4</span>
+      <span class="o">-&gt;</span> <span class="n">J3A</span>  <span class="o">-&gt;</span>
+      <span class="o">-&gt;</span> <span class="n">J4A</span>  <span class="o">-&gt;</span>  <span class="mi">8</span>
+      <span class="o">-&gt;</span> <span class="n">J5A</span>  <span class="o">-&gt;</span> <span class="mi">10</span>
+      <span class="o">-&gt;</span> <span class="n">J6A</span>  <span class="o">-&gt;</span>  <span class="mi">6</span>
+<span class="mi">26</span><span class="n">XR</span>  <span class="o">-&gt;</span> <span class="n">J7A</span>  <span class="o">-&gt;</span> <span class="mi">18</span>
+<span class="mi">26</span><span class="n">KaR</span> <span class="o">-&gt;</span> <span class="n">J8A</span>  <span class="o">-&gt;</span> <span class="mi">20</span>
+      <span class="o">-&gt;</span> <span class="n">J9A</span>  <span class="o">-&gt;</span>
+<span class="mi">14</span><span class="n">XR</span>  <span class="o">-&gt;</span> <span class="n">J10A</span> <span class="o">-&gt;</span>
+      <span class="o">-&gt;</span> <span class="n">J11A</span> <span class="o">-&gt;</span>
+      <span class="o">-&gt;</span> <span class="n">J12A</span> <span class="o">-&gt;</span> <span class="mi">24</span>
+</pre></div>
+</div>
 <div class="section" id="id32">
 <h3>Functions<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
