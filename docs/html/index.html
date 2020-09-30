@@ -70,10 +70,59 @@ To achieve this there are three base superclasses.</p>
 <p>Each of the clients in the previous figure is a subclass of <code class="docutils literal notranslate"><span class="pre">Device</span></code> which
 operates on one or more <code class="docutils literal notranslate"><span class="pre">Signal</span></code>objects that enter and leave <em>via</em>
 <code class="docutils literal notranslate"><span class="pre">Port</span></code> objects.</p>
-<div class="section" id="note">
-<h2>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h2>
-<p>These packages are still in a preliminary state.  The original code was very
-specific to the DSN context.  The conversion will proceed subsystem by susbsystem.</p>
+<div class="section" id="operation">
+<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline">¶</a></h2>
+<p>The central client works at the command line, using simulators for the antenna,
+receiver front end, and signal processing backend. <code class="docutils literal notranslate"><span class="pre">True</span></code> means that client
+is communicating with (simulated) hardware.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">MonitorControl.dss_server</span> <span class="kn">import</span> <span class="n">DSSServer</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">DSSServer</span><span class="p">(</span><span class="s1">&#39;WBDC2_K2&#39;</span><span class="p">,</span>
+                        <span class="n">config_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;hardware&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Antenna&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span>
+                                                  <span class="s1">&#39;FrontEnd&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span>
+                                                  <span class="s1">&#39;Backend&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}},</span>
+                  <span class="n">boresight_manager_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dump_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="s2">&quot;is&quot;</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="n">device</span><span class="p">])</span>
+
+<span class="n">Antenna</span> <span class="ow">is</span> <span class="n">DSN_Antenna</span> <span class="s2">&quot;DSS-43&quot;</span>
+<span class="n">FE_selector</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="n">FrontEnd</span> <span class="ow">is</span> <span class="n">K_4ch</span> <span class="s2">&quot;K&quot;</span>
+<span class="n">Rx_selector</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="n">Receiver</span> <span class="ow">is</span> <span class="n">WBDC2</span> <span class="s2">&quot;WBDC-2&quot;</span>
+<span class="n">IF_switch</span> <span class="ow">is</span> <span class="n">IFswitch</span> <span class="s2">&quot;Patch Panel&quot;</span>
+<span class="n">Backend</span> <span class="ow">is</span> <span class="n">SAOclient</span> <span class="s2">&quot;SAO spectrometer&quot;</span>
+<span class="n">sampling_clock</span> <span class="ow">is</span> <span class="kc">None</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;Backend&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">roachnames</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="p">[</span><span class="s1">&#39;roach1&#39;</span><span class="p">,</span> <span class="s1">&#39;roach2&#39;</span><span class="p">,</span> <span class="s1">&#39;roach3&#39;</span><span class="p">,</span> <span class="s1">&#39;roach4&#39;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;FrontEnd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read_PMs</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span>
+  <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">3.3588105790590205e-08</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">4.000051946785503e-08</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">5.2318605854014335e-08</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">4.906179322988035e-08</span><span class="p">)]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;FrontEnd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">feed_states</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;FrontEnd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_ND_on</span><span class="p">()</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;FrontEnd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read_PMs</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">8</span><span class="p">]:</span>
+  <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">7.344903928672483e-08</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">8.764367036205836e-08</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">1.1014350435767278e-07</span><span class="p">),</span>
+   <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">1.0521970259070695e-07</span><span class="p">)]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="n">cs</span><span class="o">.</span><span class="n">equipment</span><span class="p">[</span><span class="s1">&#39;Backend&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">hardware</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="o">&lt;</span><span class="n">Pyro5</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Proxy</span> <span class="n">at</span> <span class="mh">0x7fe5e5576e50</span><span class="p">;</span> <span class="n">connected</span> <span class="n">IPv6</span><span class="p">;</span>
+         <span class="k">for</span> <span class="n">PYRO</span><span class="p">:</span><span class="n">backend</span><span class="nd">@localhost</span><span class="p">:</span><span class="mi">50004</span><span class="p">;</span>
+         <span class="n">owner</span> <span class="o">&lt;</span><span class="n">greenlet</span><span class="o">.</span><span class="n">greenlet</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x7fe5f40e8cb0</span><span class="o">&gt;&gt;</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="base-class-modules">
@@ -943,7 +992,7 @@ number. If there is no key, that IF does not exist.</p>
   <ul>
 <li><a class="reference internal" href="#">Single Dish Radio Astronomy Software Tools</a></li>
 <li><a class="reference internal" href="#general-purpose-radio-telescope-monitor-and-control">General Purpose Radio Telescope Monitor and Control</a><ul>
-<li><a class="reference internal" href="#note">Note</a></li>
+<li><a class="reference internal" href="#operation">Operation</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#base-class-modules">Base Class Modules</a><ul>
