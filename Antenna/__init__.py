@@ -56,11 +56,14 @@ class Telescope(MC.Device, coords.DSS):
       logger.error("Please specify a DSN station number with 'dss='")
       sys.exit(0)
     name = "DSS-"+str(dss)
+    
     mylogger = logging.getLogger(logger.name+".Telescope")
     mylogger.debug("__init__: for Telescope %s", name)
+    
     coords.DSS.__init__(self, dss)
     MC.Device.__init__(self, name)
     self.logger = mylogger
+    
     # An observatory has no outputs of type Port but this at least gives some
     # Device as input.
     self.inputs = {obs.name: obs}

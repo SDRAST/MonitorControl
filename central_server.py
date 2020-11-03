@@ -2,7 +2,7 @@
 """
 dss_server.py
 
-Provides class DSSServer, a configuration-based master server for DSN antennae.
+Provides class CentralServer, a configuration-based master server for DSN antennae.
 
 If this is run as a standalone program then the appropriate environment should
 be activated.
@@ -36,12 +36,12 @@ all callback handler trying to use a callback method to return data will fail.
 
 Example of session to test the server::
 ```
-  (DSSserver) kuiper@kuiper:~$ python
+  (Centralserver) kuiper@kuiper:~$ python
   >>> hardware = {"Antenna": False,"Receiver": False,"Backend": False,"FrontEnd": False}
   >>> from MonitorControl.Configurations  import station_configuration
   >>> observatory, equipment = station_configuration('WBDC2_K2',hardware=hardware)
-  >>> from MonitorControl.apps.server.dss_server2 import DSSServer
-  >>> server = DSSServer(observatory, equipment)
+  >>> from MonitorControl.apps.server.dss_server2 import CentralServer
+  >>> server = CentralServer(observatory, equipment)
   >>> server.observatory
   Observatory "Canberra"
 
@@ -56,7 +56,7 @@ Example of session to test the server::
   {'project': {'name': 'TAMS', 'source_dir': '/usr/local/projects/TAMS/Observations'},
    'sources': {},
    'verifiers': {},
-   'info_save_dir': '/usr/local/RA_data/status/DSSServer',
+   'info_save_dir': '/usr/local/RA_data/status/CentralServer',
    'point': {'current_source': None},
    'tsys_calibration': {'date': None,
                         'el': None,
@@ -99,8 +99,6 @@ with names like this:
 A decorated method can still have a normal ``return`` for when it is called
 from within the server program itself.
 """
-
-
 import astropy
 import astropy.io.fits as pyfits
 import astropy.units as u
@@ -110,6 +108,7 @@ import pickle as pickle
 import datetime
 import dateutil
 import ephem
+import functools
 import logging
 import h5py
 import importlib
@@ -120,6 +119,7 @@ import os
 import Pyro5
 import queue
 import random
+import sys
 import threading
 import time
 import socket
@@ -131,37 +131,34 @@ mpl_logger.setLevel(logging.WARNING)
 module_logger = logging.getLogger(__name__)
 
 import Astronomy as A
-#from Astronomy.Ephem import SerializableBody
 import Astronomy.Ephem as Aeph
-#from Astronomy.redshift import V_LSR
 import Astronomy.redshift as Ared
 import Data_Reduction.boresights.boresight_manager as BSM
 import Data_Reduction.boresights.analyzer as BSA
 import Data_Reduction.FITS.DSNFITS as DSNFITS
-#from Data_Reduction.FITS.DSNFITS import FITSfile
 import DatesTimes as DT
-#from DatesTimes import UnixTime_to_datetime
 import MonitorControl as MC
-#from MonitorControl import ActionThread, MonitorControlError
-import MonitorControl.DSS_server_cfg as DSScfg
-#from MonitorControl.DSS_server_cfg import tams_config # not really TAMS
 import MonitorControl.Configurations as MCcfg
-#from MonitorControl.Configurations  import station_configuration
 from MonitorControl.Configurations.GDSCC.WVSR  import station_configuration as std_configuration
 import MonitorControl.Configurations.projects as projcfg # project configuration
+import MonitorControl.info_manager
 import MonitorControl.Receivers.DSN as DSNrx
-#from MonitorControl.Receivers.DSN import DSN_rx
 import Physics.Radiation.Lines.recomb_lines as recomb
-#from Physics.Radiation.Lines.recomb_lines import recomb_freq
 import Radio_Astronomy.bands as bands
-#from Radio_Astronomy.bands import frequency_to_band
 import support
-from support.asyncio.pyro import async_method
-import support.logs # support.logs import setup_logging
-import support.flask_server # from support.flask_server import FlaskServer
-import support.pyro.socket_error # from support.pyro.socket_error import register_socket_error
-import support.test #from support.test import auto_test
-import support.text #from support.text import make_title
+import support.logs
+import support.flask_server
+import support.pyro.socket_error
+import support.test
+import support.text
+# the async approach depends on the type of communication between programs
+if 'MonitorControl.pyro_server' in sys.modules.keys():
+  from support.asyncio.pyro import async_method, CallbackReceiver
+elif 'MonitorControl.web_server' in sys.modules.keys():
+  from support.asyncio.flaskio import async_method, CallbackReceiver
+else:
+  from support.asyncio import async_method
+
 
 from local_dirs import data_dir, proj_conf_path, projects_dir
 
@@ -169,13 +166,8 @@ from local_dirs import data_dir, proj_conf_path, projects_dir
 if __name__ == "__main__" and __package__ is None:
     __package__ = "MonitorControl"
 
-__all__ = ["DSSServer"]
+__all__ = ["CentralServer"]
 
-def nowgmt():
-  return time.time()+ time.altzone
-
-def logtime():
-  return datetime.datetime.utcnow().strftime("%H:%M:%S.%f")[:-3]
 
 support.pyro.socket_error.register_socket_error()
 
@@ -202,8 +194,33 @@ veldef = 'RADI-OBS'
 equinox = 2000
 restfreq = 22235.120 # H2O maser, MHz
 
+
+info_template = {
+            "point": {
+                "current_source": None
+            },
+            "boresight": {
+                "running": False,
+                "data_dir": data_dir + "boresight_data_dir/",
+                "offset_el": 0.0,
+                "offset_xel": 0.0
+            },
+            "tsys_calibration": {                  # converts PM reading to Tsys
+                "running": False,
+                'tsys_factors': [1e9, 1e9, 1e9, 1e9],   # for typical PM reading
+                "data_dir": data_dir + "tsys_cals/",
+                "date": None,
+                "el": None
+            },
+            "tip": {
+                "running": False,
+                "data_dir": data_dir + "tipping_data_dir/",
+            },
+        }
+
+
 @Pyro5.api.expose
-class DSSServer(support.flask_server.FlaskServer):
+class CentralServer(object):
     """
     Server that integrates functionality from a DSS station's hardware configuration.
     Many calibration and observing routines rely on integrating monitor and control
@@ -281,11 +298,7 @@ class DSSServer(support.flask_server.FlaskServer):
 
     Methods:
       Start-up and shut-down methods:
-          __init__(...)
-        set_info(path, val)
-        get_info(path=None)
-        save_info()
-        load_info()
+        __init__(...)
         close()
       Hardware control:
         configure(import_path, *args, **kwargs)
@@ -382,6 +395,7 @@ class DSSServer(support.flask_server.FlaskServer):
       "known-HII", "known-line-source", "known-maser"]
       
     def __init__(self, context,        # required
+                       parent=None,
                        project="TAMS",
                        import_path=None,
                        config_args=None,
@@ -390,7 +404,7 @@ class DSSServer(support.flask_server.FlaskServer):
                        boresight_manager_kwargs=None,
                        **kwargs):
         """
-        initialize a DSSServer
+        initialize a CentralServer
 
         Args:
             observatory: see class documentation
@@ -401,17 +415,14 @@ class DSSServer(support.flask_server.FlaskServer):
             config_kwargs: (dict) passed to station_configuration
             boresight_manager_file_paths: t.b.d.
         """
-        super(DSSServer, self).__init__(obj=self, **kwargs)
-
+        self.logger = logging.getLogger(module_logger.name+".CentralServer")
+        self.context = context
         # a valid project must be provided
         if project not in projcfg.get_projects():
           self.logger.error("__init__: %s not recognized", project)
           raise RuntimeError("%s is invalid projecty" % project)
         self.logger.debug("__init__: project is %s", project)
         self.project = project
-        self.project_dir = projects_dir + self.project + "/"
-        self.project_conf_path = proj_conf_path + self.project + "/"
-        self.status_dir = self.project_dir+ "Status/"+ self.__class__.__name__ + "/"
         # get a dict with context names and paths to their configurations
         self.configs = self.get_configs()
         self.logger.debug("__init__: configurations: %s", self.configs)
@@ -419,27 +430,41 @@ class DSSServer(support.flask_server.FlaskServer):
         # this creates attributes:
         #    observatory
         #    equipment
-        self._config_hw(context,
-                        import_path=import_path,
+        self._config_hw(import_path=import_path,
                         config_args=config_args,
                         config_kwargs=config_kwargs)
         # initialize a boresight manager
         self._config_bore(boresight_manager_file_paths=boresight_manager_file_paths,
                           boresight_manager_kwargs=boresight_manager_kwargs)
-        self._init_info()
-        self.activity = None
+        
+        self.activity = "default"
+        self.info_manager = MC.info_manager.InfoManager(parent=self,
+                                        activity=self.activity)
+        # this is later overwritten by `load_info()` in the subclass after
+        # the superclass is initialized.
+        self.info = self.info_manager.init_info("CentralServer",
+                                                template=info_template)
+        
         # categories present in the current set of sources in the correct order
         self.ordered = []
         # gallery of spectra by scan and record
         self.gallery = {}
         # convenient attributes
+        # need to get self.dss from configuration
         self.telescope = self.equipment['Antenna']
         self.frontend = self.equipment['FrontEnd']
         self.receiver = self.equipment['Receiver']
         self.patchpanel = self.equipment['IF_switch']
         self.backend = self.equipment['Backend']
         self.logger.debug("__init__: backend is %s", self.backend)
-        self.roachnames = self.backend.roachnames
+        try:
+          self.roachnames = self.backend.roachnames
+        except AttributeError:
+          # make some up
+          self.roachnames = ['roach1', 'roach2']
+        # some ad hoc stuff for the GUI for now
+        self.atten = {1: 0, 2: 0, 3: 0, 4: 0}
+        self.polstates = [0, 0]
         # initialize a FITS file
         self.initialize_FITS()
         # keep track of scans received
@@ -458,19 +483,14 @@ class DSSServer(support.flask_server.FlaskServer):
         # observing mode
         self.obsmode = obsmode
         self.restfreq = restfreq
-        # JSON file on client host
-        #self.last_spectra_file = "/var/tmp/last_spectrum.json"
-        #self.backend.init_disk_monitors()
-        #self.backend.observer.start() <<<<<<<<<<<<<< not working; maybe not needed
-        #self.specQueue = queue.Queue()
         self.specHandler = MC.ActionThread(self, self.integr_done,
                                         name="specHandler")
-        #self.specHandler = threading.Thread(target=self.integr_done,
-        #                                    name="specHandler")
         self.specHandler.daemon = True
         self.specHandler.start()
         self.logger.debug("__init__: done")
-
+        
+    # =============== initialization and configuration =========================
+    
     def initialize_FITS(self):
         """
         initialize a FITS file
@@ -582,12 +602,15 @@ class DSSServer(support.flask_server.FlaskServer):
                                       comment="beam 1 or 2")
 
         # Make the DATA column
-        fmt_multiplier = self.fitsfile.exthead['MAXIS1']*self.fitsfile.exthead['MAXIS2']* \
-                         self.fitsfile.exthead['MAXIS3']*self.fitsfile.exthead['MAXIS4']* \
+        fmt_multiplier = self.fitsfile.exthead['MAXIS1']* \
+                         self.fitsfile.exthead['MAXIS2']* \
+                         self.fitsfile.exthead['MAXIS3']* \
+                         self.fitsfile.exthead['MAXIS4']* \
                          self.fitsfile.exthead['MAXIS5']
         if nbeams > 1:
            fmt_multiplier *= self.fitsfile.exthead['MAXIS6']
-        self.logger.debug("init_binary_table: format multiplier = %d", fmt_multiplier)
+        self.logger.debug("init_binary_table: format multiplier = %d",
+                          fmt_multiplier)
         dimsval = "("+str(self.fitsfile.exthead['MAXIS1'])+"," \
                      +str(self.fitsfile.exthead['MAXIS2'])+"," \
                      +str(self.fitsfile.exthead['MAXIS3'])+"," \
@@ -610,71 +633,33 @@ class DSSServer(support.flask_server.FlaskServer):
         # empty table
         return tabhdu
 
-    def save_FITS(self):
-        """
-        Save FITS HDU list to file
-
-        The HDU structure used by this server is a pyfits.HDUList() structure
-        made up from a list with a pyfits.BinTableHDU and a pyfits.PrimaryHDU()
-
-        This creates a new HDU list structure from the attributes for only the
-        rows with data.  The file name is not changed so another call to this
-        will overwrite the previous contents, but presumably with more rows.
-        """
-        self.logger.debug("save_FITS: copying primary HDU...")
-        savePriHDU = self.fitsfile.prihdu
-        lastRow = np.unique(self.bintabHDU.data[:]['SCAN'])[-1]
-        self.logger.debug("save_FITS: bintable has %d rows; making new table", lastRow)
-        t0 = time.time()
-        saveRec = pyfits.FITS_rec.from_columns(self.fitsfile.columns, nrows=max(lastRow,1))
-        for row in range(1,lastRow):
-          saveRec[row] = self.bintabHDU.data[row]
-        saveBinTab = pyfits.BinTableHDU(data=saveRec,
-                                        header=self.fitsfile.exthead,
-                                        name="SINGLE DISH")
-        saveHDUs = [savePriHDU, saveBinTab]
-        hdulist = pyfits.HDUList(saveHDUs)
-        self.logger.debug(
-            "save_FITS: Took {:.3f} seconds to copy FITS data".format(
-                time.time() - t0))
-        t0 = time.time()
-        hdulist.writeto(self.filename, overwrite=True)
-        del savePriHDU
-        del saveRec
-        del saveBinTab
-        del saveHDUs
-        del hdulist
-        self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
-        #self.save_FITS.cb({"status": "saved to %s" % self.filename})
-
-    def _config_hw(self, context,
-                       import_path=None,
-                       config_args=None,
-                       config_kwargs=None):
+    def _config_hw(self,import_path=None,
+                        config_args=None,
+                        config_kwargs=None):
         """
         Get the equipment details for the given code
         """
-        self.logger.debug("_config_hw: for %s", context)
+        self.logger.debug("_config_hw: for %s",self.context)
         self.logger.debug("_config_hw: config args: %s", config_args)
         # get the hardware configuration
-        if context in self.configs:
+        if self.context in self.configs:
           # the usual way to get the configuration, accepting the defaults
           self.logger.debug("_config_hw: standard configuration")
-          observatory, equipment = MCcfg.station_configuration(context,
+          observatory, equipment = MCcfg.station_configuration(self.context,
                                                                **config_args)
         else:
           # if not a standard configuration, infer from context name like PSR014L
           self.logger.debug("_config_hw: non-standard configuration")
-          activity = context[:4]
-          project = self.activitys_project(activity)
-          dss = int(context[4:6])
-          band = context[7]
+          activity = self.context[:4]
+          project = self.get_activitys_project(activity)
+          dss = int(self.context[4:6])
+          band = self.context[7]
           now = time.gmtime()
           timestr = "02d02d" % (now.tm_hour, now.tm_min)
           observatory, equipment = std_configuration(None, project, dss,
                                        now.tm_year, now.tm_yday, timestr, band)
 
-        # initialize the equipment confoguration
+        # initialize the equipment configuration
         if import_path is not None:
             # non-standard path to the configuration file
             if config_args is None:
@@ -708,191 +693,41 @@ class DSSServer(support.flask_server.FlaskServer):
             **boresight_manager_kwargs
         )
 
-    def _init_info(self):
-        """
-        initialize program parameters to defaults
-        """
-        tsys_cal_dir = data_dir + "tsys_cals/"
-        self.info = {
-            "info_save_dir": self.status_dir,
-            "point": {
-                "current_source": None
-            },
-            "boresight": {
-                "running": False,
-                "data_dir": DSScfg.tams_config.boresight_data_dir,
-                "offset_el": 0.0,
-                "offset_xel": 0.0
-            },
-            "tsys_calibration": {
-                "running": False,
-                'tsys_factors': [
-                    999883083.3775496,
-                    421958318.055633,
-                    1374067124.697352,
-                    705797017.1087824
-                ],
-                "data_dir": tsys_cal_dir,
-                "date": None,
-                "el": None
-            },
-            "tip": {
-                "running": False,
-                "data_dir": DSScfg.tams_config.tipping_data_dir,
-            },
-            "project": {
-                "name": self.project,
-                "source_dir": self.project_conf_path,
-            },
-            "sources": {},
-            "verifiers": {},
-            "calibrators": {}
-        }
-        self.logger.debug("_init_info({}): _info: {}".format(logtime(),self.info))
-
-    def init_info(self, activity='TMS0'):
+    # =================== hardware primitives ===============================
+    
+    def get_crossover(self):
       """
       """
-      self.project = self.get_activitys_project(activity)
-      self._init_info()
-
+      self.crossover = self.receiver.crossSwitch.get_state()
+      return self.crossover
+    
+    def get_feed_states(self):
+      """
+      Args:
+        feed (int): 1 or 2
+      Returns:
+        bool
+      """
+      self.logger.debug("get_feed_states: called")
+      states = self.frontend.feed_states()
+      self.logger.debug("get_feed_states: got %s", states)
+      return states
+    
+    def get_atten(self, num):
+      """
+      should provide pre-polarizer attenuation per band and pol
+      """
+      return self.atten[num]
+    
+    def get_polarizer_states(self):
+      """
+      should get polarizer states
+      """
+      return self.polstates
+      
     # ------------------ Start-up and shut-down methods -----------------------
 
-    @async_method
-    def set_info(self, path, val):
-        """
-        Set some path within ``_info`` attribute in a thread safe manner
-
-        Examples:
-
-            >>> server.set_info(["project", "name"],"TAMS")
-            >>> server.set_info(["tip","running"],False)
-
-        Args:
-            path (list): "path", inside info property to value we want to set.
-            val (obj): desired value.
-
-        """
-        self.logger.debug("set_info: called with path: {}, val: {}".format(path, val))
-        with self.lock:
-            info_copy = self.info
-            sub_path = self.info[path[0]]
-            self.logger.debug("set_info: subpath: {}".format(sub_path))
-            for p in path[1:-1]:
-                sub_path = sub_path[p]
-                self.logger.debug("set_info: subpath: {}".format(sub_path))
-            sub_path[path[-1]] = val
-            self.set_info.cb() # no response to client
-
-    @support.test.auto_test()
-    @async_method
-    def get_info(self, path=None):
-        """
-        Get some path in ``_info`` attribute in thread safe attribute
-        If no path is provided, return entire ``_info`` attribute
-
-        Examples:
-
-            >>> server.get_info(["boresight","running"])
-            False
-            >>> server.get_info(["point","current_source"])
-            "0521-365"
-
-        Args:
-            path (list/None): Get some value from ``_info``, or some value from a
-                subdictionary of ``_info``.
-
-        Returns:
-            obj: Either value of dictionary/subditionary, or subdictionary itself.
-        """
-        self.logger.debug("get_info: path: {}".format(path))
-        with self.lock:
-            if path is None:
-                self.get_info.cb(self.info) # send client the entire info dict
-                return self.info
-            sub_path = self.info[path[0]]
-            for p in path[1:]:
-                sub_path = sub_path[p]
-            self.get_info.cb(sub_path) # send client the requested data
-            return sub_path
-
-    @support.test.auto_test()
-    def save_info(self):
-        """
-        Dump internal _info attribute to a file.
-        """
-        # info file should go with others, not where the file was loaded from
-        # if not os.path.exists(self.info["info_save_dir"]):
-        #    os.makedirs(self.info["info_save_dir"])
-        # self.logger.debug(
-        #    "save_info: info_save_dir: {}".format(self.info["info_save_dir"]))
-        timestamp = datetime.datetime.utcnow().strftime("%Y-%j-%Hh%Mm%Ss")
-        save_file_name = "info_{}.json".format(timestamp)
-        self.info["info_save_dir"] = self.project_dir + "Status/" \
-                                     + self.__class__.__name__ + "/"
-        save_file_path = os.path.join(self.info["info_save_dir"], save_file_name)
-        self.logger.info("save_info: Saving file {}".format(save_file_path))
-        t0 = time.time()
-        with open(save_file_path, "w") as f:
-            json.dump(self.info, f)
-        self.logger.debug(
-            "save_info({}): Took {:.3f} seconds to dump info".format(logtime(),
-                time.time() - t0))
-
-
-    @support.test.auto_test()
-    def load_info(self):
-        """
-        Load in _info attribute from most recently dumped settings file.
         
-        This assumes a file name like "info_2020-269-22h39m15s.json"
-        
-        Attribute ``info`` contains parameters for an ongoing observing activity
-        so ``DSSServer`` can start with the same software configuration as the
-        previous time.
-        
-        The location of the info files is specified in the file w
-        """
-        save_file_dir = self.info["info_save_dir"]
-        self.logger.debug(
-            "load_info: Looking in {} for status files".format(save_file_dir))
-        try:
-          statusfiles = os.listdir(save_file_dir)
-        except FileNotFoundError:
-          self.logger.warning("load_info: directory not found; using defaults")
-          os.makedirs(self.info["info_save_dir"])
-          self.logger.info("load_info: creates %s", save_file_dir)
-          return
-        self.logger.debug("load_info: found %s", statusfiles)
-        file_paths = []
-        file_datetime_objs = []
-        for f_name in statusfiles:
-            if ".json" in f_name:
-                try:
-                    datetime_str = os.path.splitext(f_name)[0].split("_")[1]
-                    datetime_obj = datetime.datetime.strptime(datetime_str, "%Y-%j-%Hh%Mm%Ss")
-                    file_datetime_objs.append(datetime_obj)
-                    file_paths.append(os.path.join(save_file_dir, f_name))
-                except Exception as err:
-                    self.logger.debug("load_info: Can't parse file name {}".format(f_name))
-        if len(file_paths) > 0:
-            # now order the files
-            ordered_dt_objs, ordered_paths = list(zip(*sorted(zip(file_datetime_objs, file_paths))))
-            # now get most recent path!
-            most_recent_path = ordered_paths[-1]
-            self.logger.info("load_info: Using file {} to set info".format(most_recent_path))
-            # now load it into memory and set _info attribute
-            t0 = time.time()
-            with open(most_recent_path, "r") as f:
-                # info_new = Trackable(json.load(f))
-                info_new = json.load(f)
-            self.info = info_new
-            self.logger.debug(
-                       "load_info({}): Took {:.3f} seconds to load info".format(
-                          logtime(), time.time() - t0))
-        else:
-            self.logger.info("load_info: Couldn't find any files with which to set info")
-
     def close(self):
         self.logger.warning("%s closed", self)
         self.save_FITS()
@@ -913,7 +748,7 @@ class DSSServer(support.flask_server.FlaskServer):
         except AttributeError:
           self.logger.info("close: no Backend defined")
         try:
-          super(DSSServer, self).close()
+          super(CentralServer, self).close()
         except AttributeError:
           self.logger.info("close: daemon no longer exists")
 
@@ -951,7 +786,6 @@ class DSSServer(support.flask_server.FlaskServer):
         self.observatory = observatory
         self.equipment = equipment
 
-    @Pyro5.api.oneway
     @async_method
     def hdwr(self, hdwr, method_name, *args, **kwargs):
         """
@@ -986,25 +820,25 @@ class DSSServer(support.flask_server.FlaskServer):
         Returns:
             results of hdwr, if not interacting with server remotely.
         """
-        self.logger.debug("hdwr({}): {} method '{}' called".format(
-                                                  logtime(), hdwr, method_name))
+        #self.logger.debug("hdwr({}): {} method '{}' called".format(
+        #                                          DT.logtime(), hdwr, method_name))
         if hdwr not in self.equipment:
             raise MC.MonitorControlError([], "Couldn't find {} in equipment".format(hdwr))
         elif self.equipment[hdwr].hardware == False:
           result = self.emulate(hdwr, method_name)
         else:
           hdwr_obj = self.equipment[hdwr]
-          self.logger.debug("hdwr: hardware is %s", hdwr_obj)
+          #self.logger.debug("hdwr: hardware is %s", hdwr_obj)
           try:
               method = getattr(hdwr_obj, method_name)
-              self.logger.debug("hdwr(%s): calling method %s", logtime(),method)
+              #self.logger.debug("hdwr(%s): calling method %s", DT.logtime(),method)
               if callable(method):
-                self.logger.debug("hdwr: with args: {}".format(args))
-                self.logger.debug("hdwr: and kwargs: {}".format(kwargs))
+                #self.logger.debug("hdwr: with args: {}".format(args))
+                #self.logger.debug("hdwr: and kwargs: {}".format(kwargs))
                 result = method(*args, **kwargs)
               else:
                 result = method # accessing an attribute
-              self.logger.debug("hdwr: result: %s", result)
+              #self.logger.debug("hdwr: result: %s", result)
           except AttributeError as err:
             raise MC.MonitorControlError([],
                      "Couldn't find method {} for {}".format(method_name, hdwr))
@@ -1012,7 +846,9 @@ class DSSServer(support.flask_server.FlaskServer):
           self.parse_result(result)
         except Exception as details:
           raise MC.MonitorControlError([], "parsing {} failed".format(result))
-        self.hdwr.cb(result) # send client the result
+        if hasattr(self.hdwr, 'cb'):
+          #self.logger.debug("hdwr: invoking callback for %s", hdwr_obj)
+          self.hdwr.cb(result) # send client the result
         return result
 
     def emulate(self, hdwr, method_name):
@@ -1038,9 +874,14 @@ class DSSServer(support.flask_server.FlaskServer):
     def get_antenna_angles(self):
         self.hdwr("Antenna", "get", "AzimuthAngle",
                                     "ElevationAngle",
+                                    "AzimuthPredictedAngle",
+                                    "ElevationPredictedAngle",
                                     "ElevationPositionOffset",
                                     "CrossElevationPositionOffset")
-
+        return self.azimuth, self.elevation, \
+               self.az_predict, self.el_predict, \
+               self.xel_offset, self.el_offset
+        
     def get_weather(self):
         self.hdwr("Antenna", "get", "temperature",
                                     "pressure",
@@ -1050,12 +891,19 @@ class DSSServer(support.flask_server.FlaskServer):
 
     def parse_result(self, result):
       if type(result) == dict:
+        self.logger.debug("parse_result: %s", result)
         if 'AzimuthAngle' in result:
           self.azimuth = float(result['AzimuthAngle'])
 
         if "ElevationAngle" in result:
           self.elevation = float(result["ElevationAngle"])
 
+        if "AzimuthPredictedAngle" in result:
+          self.az_predict = float(result["AzimuthPredictedAngle"])
+        
+        if "ElevationPredictedAngle" in result:
+          self.el_predict = float(result["ElevationPredictedAngle"])
+          
         if 'CrossElevationPositionOffset' in result:
           self.xel_offset = float(result['CrossElevationPositionOffset'])
 
@@ -1079,7 +927,7 @@ class DSSServer(support.flask_server.FlaskServer):
       else:
         self.logger.info('parse_result: %s', result)
 
-    @support.test.auto_test()
+    #@support.test.auto_test()
     def list_hdwr(self):
         """List available hardware, or the keys of ``equipment`` attribute"""
         self.logger.debug("list_hdwr: Called.")
@@ -1103,28 +951,31 @@ class DSSServer(support.flask_server.FlaskServer):
         self.info["sources"].update(sources)
         self.info["verifiers"].update(verifiers)
         #send requested info to client
-        self.load_sources.cb({"sources": sources, "verifiers": verifiers})
+        if self.load_sources.hasattr('cb'):
+          self.load_sources.cb({"sources": sources, "verifiers": verifiers})
+        return {"sources": sources, "verifiers": verifiers}
 
     def get_sources_and_verifiers(self, project_or_activity):
         """
         returns contents of 'calibrators', 'sources', and 'verifiers' files
         """
+        self.logger.debug("get_sources_and_verifiers: for %s", project_or_activity)
         # try activities first
-        projects = self.get_projects()
+        activities = self.get_activities()
         project = self.info['project']['name']
         if project_or_activity == project:
           # its a project
-          path = proj_conf_path + project + "/"
-        elif project_or_activity in projects[project_or_activity]:
+          path = proj_conf_path + project + "/default/"
+        elif project_or_activity in activities:
           # it's a project activity
-          path = proj_conf_path + project_or_activity+"/"
+          path = proj_conf_path + project + "/" + project_or_activity+"/"
         else:
           self.logger.error(
                   "get_sources_and_verifiers: activity or project %s not found",
                   project_or_activity)
           return None
         self.logger.debug("get_sources_and_verifiers(%s): path is %s",
-                                                                logtime(), path)
+                                                                DT.logtime(), path)
         with open(path+"sources.json", "r") as f:
             sources = json.load(f)
         with open(path+"verifiers.json", "r") as f:
@@ -1133,7 +984,7 @@ class DSSServer(support.flask_server.FlaskServer):
             calibrators = json.load(f)
         return sources, verifiers, calibrators
 
-    @Pyro5.api.oneway
+    @async_method  #  @Pyro5.api.oneway
     def get_source_names(self, project_or_activity):
         """
         returns names of sources in catalogs
@@ -1148,8 +999,6 @@ class DSSServer(support.flask_server.FlaskServer):
         else:
           sources, verifiers, calibrators = self.get_sources_and_verifiers(
                                                            project_or_activity)
-          #self.info["sources"].update(sources)
-          #self.info["verifiers"].update(verifiers)
           self.info["sources"] = sources
           self.info["verifiers"] = verifiers
           self.info["calibrators"] = calibrators
@@ -1160,19 +1009,96 @@ class DSSServer(support.flask_server.FlaskServer):
         sourcenames.sort()
         self.logger.debug("get_source_names: returns %d names\n",
                                                                len(sourcenames))
-        self.get_source_names.cb(sourcenames)
+        if hasattr(self.get_source_names, 'cb'):
+          self.get_source_names.cb(sourcenames)
         return sourcenames
 
-    @Pyro5.api.oneway
-    def get_sources_data(self, activity_or_project, source_names=None, when=None,
-                               filter_fn=None, formatter=None):
+    #@async_method
+    def get_sources_data(self, activity_or_project, source_names=None,
+                               when=None, formatter=None, categories=None,
+                               filter_fn=None):
         """
+        Get information about sources or verifiers, including current az/el.
+        
         Gives the same response as 'get_sources' but can handle other projects.
 
         This does not require 'load_sources'.  It will take care of that if
-        sources have not yet been loaded
-        """
+        sources have not yet been loaded.
 
+        A typical source dict looks like this::
+        
+            {'category': ['catalog', 'intermediate'],
+             'dec': -0.57454493646,
+             'flux': {'K': 0},
+             'name': 'g0002551_325508s',
+             'obs_data': [{'date':  '14-221',
+                           'el':    '61.5', 
+                           'integ': '42:57',
+                           'notes': 'IZ',
+                           'rms':   '7.707',
+                           'tsys':  '58.66'},
+                          {'date':  '17-209',
+                           'el':    None,
+                           'integ': '80',
+                           'notes': '',
+                           'rms': None,
+                           'tsys': None}],
+             'ra': 0.01273072245807307,
+             'velocity': 0.03148,
+             'key': 'catalog-intermediate',
+             'label': 'Intermediate',
+             'opacity': 0.8,
+             'r': 8,
+             'fill': '#A1A1A1'}
+
+        Examples:
+
+            >>> server.get_sources() # get all sources and verifiers
+            >>> server.get_sources("verifiers") # get all verifiers
+            >>> server.get_sources("sources") # get all non-verfier sources
+            >>> server.get_sources("0521-365") # get information about source
+                                               # 0521-365 specifically.
+
+            >>> now = datetime.datetime.utcnow()
+            >>> server.get_sources(when = now + datetime.timedelta(minutes = 5))
+                                # calculate source positions 5 minutes from now
+
+            >>> server.get_sources(when = "2018-05-03 12:39:34",
+                                   formatter = "%Y-%m-%d %H:%M:%S")
+                                   # provide formatter if when is a string
+
+        We can use ``filter_fn`` to select specific sources.
+
+        .. code-block::python
+
+            from MonitorControl.apps.clients.cli.filter_fn import find_up
+            from MonitorControl.apps.clients.cli.filter_fn import find_bright
+            # only return sources about elevation 18.
+            server.get_sources(filter_fn=find_up(el_thresh=18.0))
+            # get only verifiers whose K-band flux is about 5 Jy.
+            server.get_sources(filter_fn=find_bright(thresh=5.0))
+
+        Args:
+            activity_or_project (str):  If a project name is given the activity
+                `default` will be used.
+            source_names (list/str, optional): A list of the names of sources
+                for which to get az/el information
+            when (datetime.datetime/ephem.Date/str, optional): A date time
+                object, ephem date, or string that indicates when we should
+                calculate source coordinates. Defaults to now. If string, must
+                follow formatter
+            filter_fn (callable, optional): function used to filter out sources.
+                It takes the source object as an argument and returns True or
+                False.
+            formatter (str, optional): Used with datetime.datetime.strptime to
+                form datetime object when `when` is string.
+
+        Returns:
+            dict: dictionary whose keys are source names, and values are dictionaries
+                with source descriptions.
+
+        """
+        self.logger.debug("get_sources_data: entered for %s", categories)
         def get_source(name):
             """
             Converts Python dict to Javascript object
@@ -1189,7 +1115,8 @@ class DSSServer(support.flask_server.FlaskServer):
                 if len(self.info["sources"][name]["category"]) > 1:
                   # we ignore sources with "done" in category
                   if self.info["sources"][name]["category"][1] == "done":
-                    self.logger.info("get_sources_data.get_source: this source is done")
+                    self.logger.info("get_sources_data.get_source: %s is done",
+                                     name)
                     return None
               else:
                 # create a category item.
@@ -1231,6 +1158,8 @@ class DSSServer(support.flask_server.FlaskServer):
               # create a verifier category if necessary
               if "category" in self.info["verifiers"][name]:
                 # this is TAMS: take it
+                #self.logger.debug("get_sources_data.get_source: has category: %s",
+                #                  self.info["verifiers"][name]["category"]) 
                 pass
               # see if it is a line source
               elif 'N' in self.info["verifiers"][name]:
@@ -1256,13 +1185,20 @@ class DSSServer(support.flask_server.FlaskServer):
                   else:
                     freq = self.equipment['FrontEnd']['frequency']
                   band = bands.frequency_to_band(freq)
+                  # this is supposed to replace many band fluxes with one
                   flux = self.info["verifiers"][name]["flux"]
-                  self.info["verifiers"][name]["flux"] = {band: flux}
+                  if type(flux) == dict:
+                    pass
+                  else:
+                    self.info["verifiers"][name]["flux"] = {band: flux}
               else:
                 # no category and no flux
                 return None
-              #self.logger.debug("get_sources_data.get_source: verifier %s category is %s",
-              #                  name, self.info["verifiers"][name]["category"])
+              # self.logger.debug("get_sources_data.get_source:"
+              #                   " verifier %s category is %s",
+              #                   name,
+              #                   self.info["verifiers"][name]["category"])
+              
               # needed for key and label
               this_source = self.info["verifiers"][name]
             elif name in self.info["calibrators"]:
@@ -1273,8 +1209,12 @@ class DSSServer(support.flask_server.FlaskServer):
               # What we do need is a frequency to get the right flux
               freq = self.equipment['FrontEnd']['frequency']
               band = bands.frequency_to_band(freq)
+              # this is supposed to replace many band fluxes with one
               flux = self.info["calibrators"][name]["flux"]
-              self.info["calibrators"][name]["flux"] = {band: flux}
+              if type(flux) == dict:
+                pass
+              else:
+                self.info["calibrators"][name]["flux"] = {band: flux}
               this_source = self.info["calibrators"][name]
             else:
               # not in any source list
@@ -1289,14 +1229,15 @@ class DSSServer(support.flask_server.FlaskServer):
             ['catalog', 'priority X']
             """
             if sourcedata == None:
-              self.logger.warning("get_sources_data.make_plot_symbol_style: no data for this source")
+              self.logger.warning("get_sources_data.make_plot_symbol_style:"
+                                  " no data for this source")
               return None
             if "category" in sourcedata:
               pass
             else:
-              self.logger.debug(
-                 "get_sources_data.make_plot_symbol_style: %s has no category key",
-                 sourcedata['name'])
+              self.logger.debug("get_sources_data.make_plot_symbol_style:"
+                                " %s has no category key",
+                                sourcedata['name'])
               return None
 
             # styles key
@@ -1328,6 +1269,8 @@ class DSSServer(support.flask_server.FlaskServer):
             def radius():
               freq = self.equipment['FrontEnd']['frequency']
               band = bands.frequency_to_band(freq)
+              #self.logger.debug("get_sources_data.make_plot_symbol_style: band %s", band)
+              #self.logger.debug("get_sources_data.make_plot_symbol_style: from %s", sourcedata['flux'])
               try:
                 flux = float(sourcedata['flux'][band])
               except KeyError:
@@ -1339,18 +1282,61 @@ class DSSServer(support.flask_server.FlaskServer):
               sourcedata['r'] = 8
 
             # styles parameter 'fill'
-            sourcedata['fill'] = DSSServer.fillcolors[sourcedata['key']]
+            sourcedata['fill'] = CentralServer.fillcolors[sourcedata['key']]
             return sourcedata # ---------------- end of make_plot_symbol_style
 
-        if filter_fn is None:
-            # include all sources
+        def get_ordered_categories(sources):
+          ordered = []
+          styles = {}
+          for key in CentralServer.order:
+            # check if the key is used in any source
+            for name in list(sources.keys()):
+              if sources[name]['info']['key'] == key:
+                # do we already have this key?
+                if key in ordered:
+                  # next sources
+                  break
+                else:
+                  ordered.append(key)
+                  styles[key] = {}
+                  styles[key]['class']   = sources[name]['info']['category']
+                  styles[key]['fill']    = sources[name]['info']['fill']
+                  styles[key]['opacity'] = sources[name]['info']['opacity']
+                  styles[key]['r']       = sources[name]['info']['r']
+                  styles[key]['display'] = sources[name]['info']['label']
+          return ordered, styles
+
+        # method proper starts here
+        #   define the filter
+        if categories:
+            # provide category filter
+            #self.logger.debug("get_sources_data: categories: %s", categories)
+            def filter_fn(src_dict):
+                # accept source if in allowed category
+                #self.logger.debug("get_source_data.filter_fn: dict: %s", src_dict)
+                for cat in categories:
+                  status = False
+                  if cat == src_dict['info']['key']:
+                    #self.logger.debug('get_sources_data:filter_fn: key matches %s', cat)
+                    status = True
+                    break
+                  else:
+                    #self.logger.debug('get_sources_data:filter_fn: key is not %s', cat)
+                    pass
+                #self.logger.debug('get_sources_data:filter_fn: accepted is %s', status)
+                return status
+        elif filter_fn:
+            pass
+        else:
+            # all sources
             def filter_fn(src_dict):
                 """
                 If specified, 'filter_fn' returns True only for the sources to
                 be included.  This defaults them all to True
                 """
                 return True
-
+            
+        #self.logger.debug("get_sources_data: filter is %s", filter_fn)
         # get source data from 'self.info' or from files if necessary.
         sources, verifiers, calibrators = self.get_sources_and_verifiers(
                                                            activity_or_project)
@@ -1360,12 +1346,14 @@ class DSSServer(support.flask_server.FlaskServer):
         # get a list of source names so 'get_source' can process each source
         if source_names is None:
           source_names = self.get_source_names(activity_or_project)
+        elif source_names == "calibrators":
+          source_names = list(self.info["calibrators"].keys())
         elif source_names == "verifiers":
           source_names = list(self.info["verifiers"].keys())
         elif source_names == "sources":
           source_names = list(self.info["sources"].keys())
         self.logger.debug("get_sources_data(%s): for %s", 
-                                                        logtime(), source_names)
+                                                     DT.logtime(), source_names[:20])
 
         # set time or default to now; this is the time used for the sky plot
         if when is None:
@@ -1381,7 +1369,7 @@ class DSSServer(support.flask_server.FlaskServer):
         # continue to process as in get_sources
         self.equipment["Antenna"].date = when
         self.logger.debug(
-                      "get_sources_data.get_sources: reformatting Antenna's date to {}".format(when))
+              "get_sources_data.get_sources: reformatting Antenna's date to {}".format(when))
 
         # returns {"lat":..., "long":..., "elev":..., "epoch":..., "date":...}
         observer_info = self._get_observer_info_dict()
@@ -1390,9 +1378,10 @@ class DSSServer(support.flask_server.FlaskServer):
         sources = {}
         order = []
         for source_name in source_names:
-            source_info = make_plot_symbol_style(get_source(source_name))
-            #self.logger.debug("get_sources_data: %s info: %s", source_name, source_info)
-            if source_info is not None:
+            source_dict = get_source(source_name)
+            #self.logger.debug("get_sources_data: %s dict: %s", source_name, source_dict)
+            if source_dict is not None:
+                source_info = make_plot_symbol_style(source_dict)            
                 # extends ephem.FixedBody with methods to_dict() and from_dict()
                 b = Aeph.SerializableBody()
                 try:
@@ -1412,52 +1401,33 @@ class DSSServer(support.flask_server.FlaskServer):
                 if filter_fn(source):
                     sources[source_name] = source
             else:
+                source_names.remove(source_name)
                 self.logger.error(
                     "get_sources_data: No data for source {}".format(source_name))
+        self.logger.debug("get_sources_data: found %d sources", len(sources))
         now = ephem.now()
         self.logger.debug(
             "get_sources_data: setting Antenna's date to {}".format(now))
         self.equipment["Antenna"].date = now # reset time to compute new data
 
-        def get_ordered_categories(sources):
-          ordered = []
-          styles = {}
-          for key in DSSServer.order:
-            # check if the key is used in any source
-            for name in list(sources.keys()):
-              if sources[name]['info']['key'] == key:
-                # do we already have this key?
-                if key in ordered:
-                  # next sources
-                  break
-                else:
-                  ordered.append(key)
-                  styles[key] = {}
-                  styles[key]['class']   = sources[name]['info']['category']
-                  styles[key]['fill']    = sources[name]['info']['fill']
-                  styles[key]['opacity'] = sources[name]['info']['opacity']
-                  styles[key]['r']       = sources[name]['info']['r']
-                  styles[key]['display'] = sources[name]['info']['label']
-          return ordered, styles
-
         self.ordered, self.styles = get_ordered_categories(sources)
-        self.get_sources_data.cb(sources) # send client the dict 'sources'
-
+        self.logger.debug("get_sources_data: ordered: %s", self.ordered)
+        self.logger.debug("get_sources_data: styles: %s", self.styles)
+        if hasattr(self.get_sources_data, "cb"):
+          self.get_sources_data.cb(sources) # send client the dict 'sources'
+        self.logger.debug("get_sources_data: callback done")
         if len(sources) == 1:
             return sources[list(sources.keys())[0]]
         else:
             return sources
-        return
-
-    @async_method
-    def get_styles(self):
-      self.get_styles.cb(self.styles)
-      return self.styles
-
-    @async_method
+    
     def get_ordered(self):
-      self.get_ordered.cb(self.ordered)
+      self.logger.debug("get_ordered: returning %s", self.ordered)
       return self.ordered
+
+    def get_styles(self):
+      self.logger.debug("get_styles: returning %s", self.styles)
+      return self.styles
 
     @async_method
     def get_sources(self, source_names=None, when=None, filter_fn=None,
@@ -1544,14 +1514,14 @@ class DSSServer(support.flask_server.FlaskServer):
             """
             Find the source in whatever catalog it exists
             """
-            if name in self.info["sources"]:
-                return self.info["sources"][name]
+            if   name in self.info["sources"]:
+                  return self.info["sources"][name]
             elif name in self.info["verifiers"]:
-                return self.info["verifiers"][name]
+                  return self.info["verifiers"][name]
             elif name in self.info["calibrators"]:
-                return self.info["calibrators"][name]
+                  return self.info["calibrators"][name]
             else:
-                return None
+                  return None
 
         # Not clear what the logic is here.  I guess it depends on what
         # attribute 'date' is.
@@ -1620,8 +1590,10 @@ class DSSServer(support.flask_server.FlaskServer):
             convert = 1.0
 
         if hasattr(name_or_dict, "keys") and hasattr(name_or_dict, "__iter__"):
+            # this handles a source structure
             src_name = name_or_dict["name"]
         else:
+            # this handles a source name
             src_name = name_or_dict
 
         src_info0 = self.get_sources(source_names=src_name)
@@ -1742,7 +1714,7 @@ class DSSServer(support.flask_server.FlaskServer):
 
     # ------------------------- Observatory Details ---------------------------
 
-    @support.test.auto_test()
+    #@support.test.auto_test()
     def _get_observer_info_dict(self):
         """
         Get a dictionary with current observer information.
@@ -1850,7 +1822,7 @@ class DSSServer(support.flask_server.FlaskServer):
         f_obj = file_cls(f_path, "w")
         return f_obj, f_path
 
-    @Pyro5.api.oneway
+    #@Pyro5.api.oneway
     @async_method
     def scanning_boresight(self,
                            el_previous_offset,
@@ -2119,7 +2091,8 @@ class DSSServer(support.flask_server.FlaskServer):
                 timestamp_before, total_offset_before = get_total_offset(axis)
                 total_current_offset = total_offset_before
                 try:
-                    tsys_timestamp, cur_tsys = self.get_tsys(timestamp=True)
+                    tsys_timestamp, cur_tsys, readings = \
+                                                   self.get_tsys(timestamp=True)
                 except Exception as err:
                     self.logger.error(
                         ("scanning_boresight.scan_and_collect: "
@@ -2252,7 +2225,7 @@ class DSSServer(support.flask_server.FlaskServer):
         })
         return analyzer_obj
 
-    @Pyro5.api.oneway
+    #@Pyro5.api.oneway
     @async_method
     def stepping_boresight(self,
                            el_previous_offset,
@@ -2766,6 +2739,7 @@ class DSSServer(support.flask_server.FlaskServer):
         gains = gain_cal(Tlna, Tf, R1, R2, R3, R4, R5,
                          load, Fghz, TcorrNDcoupling)
         module_logger.debug("process_minical_calib: gain_cal returned B, BC, CC, Tnd: {}".format(gains))
+        
         B = gains[0]  # linear gain
         if np.any(B == 0):
             module_logger.debug("process_minical_calib: process_minical result for gain: {}".format(B))
@@ -2799,14 +2773,20 @@ class DSSServer(support.flask_server.FlaskServer):
         module_logger.info("process_minical_calib: NonLin: {}".format(NonLin))
         module_logger.info("process_minical_calib: New tsys factors: {}".format(tsys_factors))
 
-        return {'gains': [a.tolist() for a in gains],
-                'linear': [a.tolist() for a in Tlinear],
+        return {'zero':    R1.tolist(),
+                'sky':     R2.tolist(),
+                'sky+ND':  R3.tolist(),
+                'load':    R4.tolist(),
+                'load+ND': R5.tolist(),
+                'load K':  load.tolist(),
+                'gains':     [a.tolist() for a in gains],
+                'linear':    [a.tolist() for a in Tlinear],
                 'quadratic': [a.tolist() for a in Tquadratic],
-                'nd_temp': Tnd.tolist(),
+                'nd_temp':       Tnd.tolist(),
                 'non_linearity': NonLin.tolist(),
-                'tsys_factors': tsys_factors}
+                'tsys_factors':  tsys_factors}
 
-    @Pyro5.api.oneway
+    #@Pyro5.api.oneway
     @async_method
     def tsys_calibration(self, settle_time=1.0, pm_integration_time=3.0):
         """
@@ -2822,7 +2802,7 @@ class DSSServer(support.flask_server.FlaskServer):
                 This was added to algorithm at Tom Kuiper's recommendation.
 
         Returns:
-            dict: results of DSSServer.process_minical_calib.
+            dict: results of CentralServer.process_minical_calib.
         """
         self.info["tsys_calibration"]["date"] =  \
                           datetime.datetime.utcnow().strftime("%Y-%j-%Hh%Mm%Ss")
@@ -2953,7 +2933,6 @@ class DSSServer(support.flask_server.FlaskServer):
         fe_temp = self.equipment["FrontEnd"].read_temps()
         calib['Tload'] = np.array([fe_temp['load1'], fe_temp['load1'],
                                    fe_temp['load2'], fe_temp['load2']])
-
         self.logger.debug("tsys_calibration: calib: {}".format(calib))
 
         tsys_calibration_base_dir = self.info["tsys_calibration"]["data_dir"]
@@ -2965,12 +2944,12 @@ class DSSServer(support.flask_server.FlaskServer):
             f_obj.create_dataset(key, data=np.array(calib[key]))
         f_obj.close()
 
-        results = DSSServer.process_minical_calib(calib)
+        results = CentralServer.process_minical_calib(calib)
         tsys_factors = np.array(results["tsys_factors"])
         tsys_factors[np.logical_not(np.isfinite(tsys_factors))] = 1.0
         self.info["tsys_calibration"]["tsys_factors"] = tsys_factors.tolist()
         self.info["tsys_calibration"]['running'] = False
-        self.save_info()
+        self.info_manager.save_info()
 
         msg = "Minical finished"
         self.logger.info("tsys_calibration: " + msg)
@@ -3037,7 +3016,7 @@ class DSSServer(support.flask_server.FlaskServer):
 
     # --------------------------------- Data Acquisition ----------------------
 
-    @support.test.auto_test()
+    @async_method #@support.test.auto_test()
     def get_tsys(self, timestamp=False):
         """
         Get system temperature, in units of Kelvin, i.e. power meter readings
@@ -3060,25 +3039,37 @@ class DSSServer(support.flask_server.FlaskServer):
                 datetime.datetime object corresponding to when readings were
                 requested.
         """
-        self.logger.debug("get_tsys(%s): entered; calling hdwr", logtime())
+        self.logger.debug("get_tsys(%s): entered; calling hdwr", DT.logtime())
         res = self.hdwr("FrontEnd", "read_PMs")
-        self.logger.debug("get_tsys(%s): hdwr response: %s", logtime(), res)
+        self.logger.debug("get_tsys(%s): hdwr response: %s", DT.logtime(), res)
         tsys = []
+        readings = []
         for i in range(len(res)):
           reading = res[i][-1]
           if reading > 1:
             reading = 0
+          readings.append(reading)
           tsys.append(reading*self.info["tsys_calibration"]["tsys_factors"][i])
         self.tsys = tsys
-        self.logger.debug("get_tsys(%s): returns %s", logtime(), tsys)
+        self.logger.debug("get_tsys(%s): returns %s", DT.logtime(), tsys)
         if not timestamp:
-          return tsys
+          if hasattr(self.get_tsys, 'cb'):
+            self.get_tsys.cb(tsys)
+            self.logger.debug("get_tsys: returned via callback")
+          else:
+            self.logger.debug("get_tsys:normal return")
+            return tsys
         else:
           timestamp = datetime.datetime.utcnow()
           self.logger.debug("get_tsys: timestamp: {}".format(timestamp))
-          return timestamp, tsys
+          if hasattr(self.get_tsys, 'cb'):
+            self.get_tsys.cb((timestamp, tsys, readings))
+            self.logger.debug("get_tsys: returned via callback")
+          else:
+            self.logger.debug("get_tsys: normal return")
+            return timestamp, tsys, readings
 
-    @Pyro5.api.oneway
+    @async_method
     def get_spectrum(self):
         """
         Get the spectra from all ROACHs
@@ -3086,8 +3077,10 @@ class DSSServer(support.flask_server.FlaskServer):
         This has a call to the backend client, which makes a Pyro call to the
         server
         """
+
         self.logger.debug("get_spectrum: invoked")
-        print("get_spectra: invoked")
+        return None
+        # one_scan() not implemented
         response = self.equipment["Backend"].one_scan()
         self.logger.debug("get_spectrum: headers: %s", response[0])
         print(("get_spectra: headers: %s" % response[0]))
@@ -3106,18 +3099,20 @@ class DSSServer(support.flask_server.FlaskServer):
         self.last_rec = rec_keys[-1]
         return last_scan, last_rec
 
-    @Pyro5.api.oneway
     def last_scan(self):
         """
         Return the last recorded good scan set from the server
         """
         self.logger.debug("last_scan: entered")
         response = self.equipment['Backend'].last_spectra()
+        time.sleep(1)
         self.logger.debug("last_scan: got %s", response)
-        self.last_scan.cb(response)
-        self.logger.debug("last_scan: finished")
+        if hasattr(self.last_scan, "cb"):
+            self.last_scan.cb(response)
+        self.logger.debug("last_scan: finished at %s", datetime.datetime.now())
+        self.logger.debug("last_scan: returning %s", type(response))
+        return response
 
-    @Pyro5.api.oneway
     def last_beam_diff(self):
         last_scan, last_rec = self.last_scan()
 
@@ -3158,7 +3153,7 @@ class DSSServer(support.flask_server.FlaskServer):
 
     @async_method
     def start_spec_scans(self, n_scans=1, n_spectra=10, int_time=1,
-                               log_n_avg=4, mid_chan=None):
+                               log_n_avg=6, mid_chan=None):
         """
         This is invoked by the Vue client
 
@@ -3181,7 +3176,7 @@ class DSSServer(support.flask_server.FlaskServer):
         @type  mid_chan : int
         """
         self.logger.debug("start_spec_scans(%s): invoked for %d scans of %d spectra",
-                          logtime(), n_scans, n_spectra)
+                          DT.logtime(), n_scans, n_spectra)
         if self.obsmode == "BMSW" or self.obsmode == "BPSW" or self.obsmode == "PSSW":
           # must be even number of scans
           if n_scans % 2:
@@ -3218,7 +3213,9 @@ class DSSServer(support.flask_server.FlaskServer):
                                                n_accums=n_spectra,
                                                integration_time=int_time)
         self.logger.debug("start_spec_scans: finished")
-        self.start_spec_scans.cb({"left": self.scans_left}) # sent to client
+        if hasattr(self.start_spec_scans, "cb"):
+          self.start_spec_scans.cb({"left": self.scans_left}) # sent to client
+        
 
     def integr_done(self):
         """
@@ -3234,7 +3231,7 @@ class DSSServer(support.flask_server.FlaskServer):
         """
         self.logger.debug("integr_done: called")
         res = self.backend.cb_receiver.queue.get()
-        starttime = nowgmt()
+        starttime = DT.nowgmt()
         self.logger.debug("integr_done: got %s message at %s", 
                           type(res), starttime)
         if type(res) == dict:
@@ -3249,6 +3246,7 @@ class DSSServer(support.flask_server.FlaskServer):
             spectra_table = self.display_data(res)
             # notify the client that a record has been received
             try:
+              self.start_spec_scans.caller._pyroClaimOwnership()
               self.start_spec_scans.cb({"type": "start",
                                         "scan": res["scan"],
                                         "record": res["record"],
@@ -3258,7 +3256,7 @@ class DSSServer(support.flask_server.FlaskServer):
               pass
             self.spectra_left -= 1
             self.logger.debug("integr_done: %d spectra left", self.spectra_left)
-            self.logger.debug("integr_done: elapsed time %s", nowgmt()-starttime)
+            self.logger.debug("integr_done: elapsed time %s", DT.nowgmt()-starttime)
             # add to FITS row and add to FITS file when spectra_left = 0.
             self.add_data_to_FITS(res)
             # beam and/or position switching if appropriate.
@@ -3311,10 +3309,12 @@ class DSSServer(support.flask_server.FlaskServer):
           self.logger.error("integr_done: got 'list' type result")
           # just the titles
           self.logger.debug("integr_done: got %s", res[0])
+          self.start_spec_scans.caller._pyroClaimOwnership()
           self.start_spec_scans.cb(res)
         # got something other than dict or list
         else:
           self.logger.debug("integr_done: got type {}".format(type(res)))
+          self.start_spec_scans.caller._pyroClaimOwnership()
           self.start_spec_scans.cb(res)
         self.logger.debug("integr_done: finished")
         
@@ -3415,6 +3415,43 @@ class DSSServer(support.flask_server.FlaskServer):
         for roach in self.roachnames:
           index = self.roachnames.index(roach)
           self.signal_end[self.pols[index],self.beams[index]] = roach
+
+    def save_FITS(self):
+        """
+        Save FITS HDU list to file
+
+        The HDU structure used by this server is a pyfits.HDUList() structure
+        made up from a list with a pyfits.BinTableHDU and a pyfits.PrimaryHDU()
+
+        This creates a new HDU list structure from the attributes for only the
+        rows with data.  The file name is not changed so another call to this
+        will overwrite the previous contents, but presumably with more rows.
+        """
+        self.logger.debug("save_FITS: copying primary HDU...")
+        savePriHDU = self.fitsfile.prihdu
+        lastRow = np.unique(self.bintabHDU.data[:]['SCAN'])[-1]
+        self.logger.debug("save_FITS: bintable has %d rows; making new table", lastRow)
+        t0 = time.time()
+        saveRec = pyfits.FITS_rec.from_columns(self.fitsfile.columns, nrows=max(lastRow,1))
+        for row in range(1,lastRow):
+          saveRec[row] = self.bintabHDU.data[row]
+        saveBinTab = pyfits.BinTableHDU(data=saveRec,
+                                        header=self.fitsfile.exthead,
+                                        name="SINGLE DISH")
+        saveHDUs = [savePriHDU, saveBinTab]
+        hdulist = pyfits.HDUList(saveHDUs)
+        self.logger.debug(
+            "save_FITS: Took {:.3f} seconds to copy FITS data".format(
+                time.time() - t0))
+        t0 = time.time()
+        hdulist.writeto(self.filename, overwrite=True)
+        del savePriHDU
+        del saveRec
+        del saveBinTab
+        del saveHDUs
+        del hdulist
+        self.logger.debug("save_FITS: wrote FITS to %s in %s s", self.filename, time.time()-t0)
+        #self.save_FITS.cb({"status": "saved to %s" % self.filename})
 
     def difference_beams(self, res):
         """
@@ -3674,6 +3711,9 @@ class DSSServer(support.flask_server.FlaskServer):
 
 # ---------------------------- Miscellaneous Methods --------------------------
 
+    def report_info(self):
+        return self.info_manager.report_info()
+        
     @async_method
     def set_obsmode(self, new_mode):
         """
@@ -3681,17 +3721,31 @@ class DSSServer(support.flask_server.FlaskServer):
         """
         self.obsmode = new_mode
         self.logger.debug("set_obsmode(%s): mode is now %s",
-                          logtime(), self.obsmode)
-
+                          DT.logtime(), self.obsmode)
+    
+    def get_obsmode(self):
+        self.logger.debug("get_mode: %s", self.obsmode)
+        return self.obsmode
+        
     def set_rest_freq(self, new_freq):
         self.restfreq = new_freq
         self.logger.info("set_rest_freq (%s): rest frequency is now %f",
-                         logtime(), self.restfreq)
+                         DT.logtime(), self.restfreq)
 
-    def server_time(self, *args, **kwargs):
-        self.logger.debug("args: %s", args)
-        self.logger.debug("keyword args: %s", kwargs)
-        return datetime.datetime.utcnow().strftime("%Y-%j-%Hh%Mm%Ss")
+    def server_time(self):
+        """
+        returns UT and LST formatted for display
+        """
+        UT_fmt = datetime.datetime.utcnow().strftime("%H:%M:%Ss")
+        
+        now = time.gmtime() # struct_time tuple
+        # GST in hours from UT year and float DOY, corrected for longitude
+        doy = now.tm_yday + (now.tm_hour + now.tm_min/60. + now.tm_sec/3600.)/24
+        LST_hr = (A.greenwich_sidereal_time(now.tm_year, 
+                                            doy - self.location.lon.hour/24.)
+                 )
+        LST_fmt = A.decimal_day_to_HMS(now.tm_yday + (LST_hr/24))
+        return UT_fmt, LST_fmt
 
     def get_configs(self):
         """
@@ -3701,7 +3755,149 @@ class DSSServer(support.flask_server.FlaskServer):
         return configs
 
     def help(self):
-      return """
+      return self.__doc__
+    
+    def get_frontend_temps(self):
+        fe_temp = self.equipment["FrontEnd"].read_temps()
+        return fe_temp
+
+    @async_method
+    def get_projects(self):
+      """
+      get a list of all the projects
+      """
+      projects = []
+      for project in projcfg.get_projects():
+        projects.append(project)
+      projects.sort()
+      try:
+        projects.remove('__pycache__')
+      except:
+        pass
+      self.logger.debug("get_projects: %s", projects)
+      if hasattr(self.get_projects, "cb"):
+        self.get_projects.cb(projects)
+      return projects
+
+    @async_method
+    def get_activities(self):
+      """
+      get a list of all the activities of the current project
+      """
+      project = self.info['project']['name']
+      activities = projcfg.get_activity()[project]
+      self.logger.debug("get_activities: activities: %s", activities)
+      activities.sort()
+      self.logger.debug("get_activities: %s", activities)
+      if hasattr(self.get_activities, 'cb'):
+        self.get_activities.cb(activities)
+      return activities
+
+    def get_current_activity(self):
+      """
+      get activity being carried out
+      """
+      return self.activity
+    
+    def get_current_context(self):
+      return self.context
+      
+    @async_method
+    def get_equipment(self):
+      """
+      get a list of all the devices in the current configuration
+      """
+      devices = {}
+      for device,obj in list(self.equipment.items()):
+        if obj != None:
+          devices[device] = str(obj)
+      self.get_equipment.cb(devices)
+      return devices
+
+    @async_method
+    def change_project(self, project, activity=None, context=None):
+      """
+      select new project
+      """
+      self.info['sources'] = {}
+      self.info['verifiers'] = {}
+      self.info['project']['name'] = project
+      self.info['project']["source_dir"] = projects_dir+project+"/Observations"
+      self.project = project
+      if activity:
+        self.activity = activity
+      else:
+        self.activity = self.get_default_activity(self.project)
+      self.logger.debug("change_project: activity is %s", self.activity)
+      if context:
+        if context in list(self.get_configs().keys()):
+          observatory, equipment = MCcfg.station_configuration(context)
+      else:
+        context = configs[self.project][self.activity]
+        self.logger.debug("change_project: context is %s", context)
+        if context in list(self.get_configs().keys()):
+          observatory, equipment = MCcfg.station_configuration(context)
+        else:
+          # assume a form AAAADDB
+          activity = context[:4]
+          dss = int(context[4:6])
+          band = context[6]
+          now = time.gmtime()
+          timestr = "%02d%02d" % (now.tm_hour, now.tm_min)
+          observatory, equipment = std_configuration(None, self.activity, dss,
+                                          now.tm_year, now.tm_yday, timestr, band)
+      self.context = context
+       
+    @async_method
+    def get_activitys_project(self, activity):
+      """
+      get the project associated with the current activity
+      
+      This is just for an information request by the client.  It does not change
+      the current ptoject.
+      """
+      self.logger.debug("get_activitys_project: called for %s", activity)
+      project = projcfg.activity_project(activity)
+      self.logger.debug("get_activitys_project: project is %s", project)
+      self.get_activitys_project.cb(project)
+      return project
+
+    @async_method
+    def get_default_activity(self, project):
+      """
+      This assumes a specific format for the project and activity names.
+      
+      This is just for an information request by the client.  It does not change
+      the current activity.
+      """
+      self.logger.debug("get_default_activity: called for %s", project)
+      activity = get_auto_project(project).split("_")[1]+'0'
+      self.logger.debug("get_default_activity: activity is %s", activity)
+      self.get_default_activity.cb(activity)
+      return activity
+
+    @async_method
+    def get_project_activities(self, project):
+      """
+      Get the activities associated with a project.
+
+      This assumes a specific format for the project and activity names. It
+      should probably go in the Automation module.
+      """
+      self.logger.debug("get_project_activities: called for %s", project)
+      activity_root = get_auto_project(project).split("_")[1]
+      proj_activities = []
+      for activity in self.get_activities():
+        if activity_root in activity:
+          proj_activities.append(activity)
+      proj_activities.sort()
+      self.logger.debug("get_project_activities: activities are %s",
+                        proj_activities)
+      self.get_project_activities.cb(proj_activities)
+      return proj_activities
+
+# redundant with docstring
+    """
      Attributes:
         observatory (MonitorControl.Observatory): Observatory instance
         equipment (dict): dictionary describing antenna/station hardware
@@ -3769,186 +3965,4 @@ class DSSServer(support.flask_server.FlaskServer):
       Miscellaneous:
         server_time(): returns current time
       """
-
-    @async_method
-    def get_projects(self):
-      """
-      get a list of all the projects
-      """
-      projects = []
-      for project in projcfg.get_projects():
-        projects.append(project)
-      projects.sort()
-      self.get_projects.cb(projects)
-      return projects
-
-    @async_method
-    def get_activities(self):
-      """
-      get a list of all the activities of the current project
-      """
-      project = self.info['project']['name']
-      activities = projcfg.get_activity()[project]
-      self.logger.debug("get_activities: activities: %s", activities)
-      activities.sort()
-      self.get_activities.cb(activities)
-      return activities
-
-    @async_method
-    def get_equipment(self):
-      """
-      get a list of all the devices in the current configuration
-      """
-      devices = {}
-      for device,obj in list(self.equipment.items()):
-        if obj != None:
-          devices[device] = str(obj)
-      self.get_equipment.cb(devices)
-      return devices
-
-    @async_method
-    def change_project(self, project, activity=None, context=None):
-      """
-      select new project
-      """
-      self.info['sources'] = {}
-      self.info['verifiers'] = {}
-      self.info['project']['name'] = project
-      self.info['project']["source_dir"] = projects_dir+project+"/Observations"
-      self.project = project
-      if activity:
-        self.activity = activity
-      else:
-        self.activity = self.get_default_activity(self.project)
-      self.logger.debug("change_project: activity is %s", self.activity)
-      if context:
-        if context in list(self.get_configs().keys()):
-          observatory, equipment = MCcfg.station_configuration(context)
-      else:
-        context = configs[self.project][self.activity]
-        self.logger.debug("change_project: context is %s", context)
-        if context in list(self.get_configs().keys()):
-          observatory, equipment = MCcfg.station_configuration(context)
-        else:
-          # assume a form AAAADDB
-          activity = context[:4]
-          dss = int(context[4:6])
-          band = context[6]
-          now = time.gmtime()
-          timestr = "%02d%02d" % (now.tm_hour, now.tm_min)
-          observatory, equipment = std_configuration(None, self.activity, dss,
-                                          now.tm_year, now.tm_yday, timestr, band)
-
-    @async_method
-    def get_activitys_project(self, activity):
-      """
-      get the project associated with the current activity
-      
-      This is just for an information request by the client.  It does not change
-      the current ptoject.
-      """
-      self.logger.debug("get_activitys_project: called for %s", activity)
-      project = projcfg.activity_project(activity)
-      self.logger.debug("get_activitys_project: project is %s", project)
-      self.get_activitys_project.cb(project)
-      return project
-
-    @async_method
-    def get_default_activity(self, project):
-      """
-      This assumes a specific format for the project and activity names.
-      
-      This is just for an information request by the client.  It does not change
-      the current ptoject.
-      """
-      self.logger.debug("get_default_activity: called for %s", project)
-      activity = get_auto_project(project).split("_")[1]+'0'
-      self.logger.debug("get_default_activity: activity is %s", activity)
-      self.get_default_activity.cb(activity)
-      return activity
-
-    @async_method
-    def get_project_activities(self, project):
-      """
-      Get the activities associated with a project.
-
-      This assumes a specific format for the project and activity names. It
-      should probably go in the Automation module.
-      """
-      self.logger.debug("get_project_activities: called for %s", project)
-      activity_root = get_auto_project(project).split("_")[1]
-      proj_activities = []
-      for activity in self.get_activities():
-        if activity_root in activity:
-          proj_activities.append(activity)
-      proj_activities.sort()
-      self.logger.debug("get_project_activities: activities are %s",
-                        proj_activities)
-      self.get_project_activities.cb(proj_activities)
-      return proj_activities
-
-
-# ================================= Program ===================================
-
-if __name__ == "__main__":
-    
-    def create_arg_parser():
-      """
-      create an argument parser and define arguments
-      """
-      import argparse
-      parser = argparse.ArgumentParser(description="Fire up DSS control server.")
-      parser.add_argument("--verbose", "-v",
-                        dest="verbose", required=False,
-                        action="store_true", default=True,
-                        help="In verbose mode, the log level is DEBUG; default: False")
-      parser.add_argument("--simulated", "-s",
-                        dest="simulated", required=False,
-                        action="store_true", default=True,
-                        help="In simulated mode, DSS Server won't attempt to "
-                             +"connect to hardware servers. Default: True")
-      parser.add_argument("--flask", "-f",
-                        dest="flask", required=False,
-                        action="store_true", default=False,
-                        help="Run server as flask server; default: False")
-      parser.add_argument("--flaskio", "-fio",
-                        dest="flaskio", required=False,
-                        action="store_true", default=False,
-                        help="Run server as flask io server; default: False")
-      return parser
-
-    # parsed is an object with arguments as attributes
-    parsed = create_arg_parser().parse_args()
-
-    # specify logging level
-    level = logging.DEBUG
-    if not parsed.verbose:
-        level = logging.INFO
-    mylogger = support.logs.setup_logging(logLevel=level)
-
-    logging.getLogger("support").setLevel(logging.DEBUG)
-
-    mylogger.debug("arguments: %s", parsed)
-
-    # create and launch the central server
-    #server = DSSServer(observatory, equipment,
-    #                   logger=logging.getLogger(__name__+".DSSServer"))
-    server = DSSServer('WBDC2_K2')
-
-    try:
-      if parsed.flask:
-        app, server = DSSServer.flaskify(server)
-        app.run(port=5000)
-      elif parsed.flaskio:
-        app, socketio, server = DSSServer.flaskify_io(server)
-        socketio.run(app, port=5000, debug=False, log_output=False)
-      else:
-        server.launch_server(
-            objectId=equipment["Antenna"].name,
-            objectPort=50015, ns=False, threaded=False, local=True
-        )
-    except (KeyboardInterrupt, SystemExit):
-      mylogger.warning("Server terminated at %s",
-                       datetime.datetime.utcnow().strftime("%Y-%j-%Hh%Mm%Ss"))
-      server.close()
 

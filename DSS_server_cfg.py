@@ -36,7 +36,9 @@ __all__ = [
 ])
 
 class TAMSConfiguration(object):
-
+    """
+    class to fill out a configuration object with additional attributes
+    """
     def __init__(self,
                  data_dir="",
                  calibration_dir="",

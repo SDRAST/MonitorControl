@@ -44,12 +44,12 @@ def get_projects():
     if os.path.isdir(path):
       sci_project = os.path.basename(path)
       sciprojects.append(sci_project)
-  logger.debug("get_projects: directory items: %s", sciprojects)
   # is this necessary?
   try:
     sciprojects.remove('__pycache__')
   except:
     pass
+  logger.debug("get_projects: directory items: %s", sciprojects)
   return sciprojects
 
 def get_activity():

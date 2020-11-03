@@ -49,6 +49,12 @@ setup_logging(logger=logging.getLogger(""),
 for module in module_levels:
     logging.getLogger(module).setLevel(module_levels[module])
 
+class FlaskServer(object):
+  """
+  do nothing class to identify this module to CentralServer
+  """
+  def __init__(self):
+    self.name = "Flask server"
 
 class JSONWrapper(object):
 
@@ -58,23 +64,6 @@ class JSONWrapper(object):
 
     def loads(self, *args, **kwargs):
         return json.loads(*args, **kwargs)
-
-
-def setup_server(server):
-    """
-    Asks DSSServer if the antenna server is simulated
-    
-    If it is, it does not connect to hardware and sets the Complex to CDSCC.
-    This needs fixing, at least, the CDSCC bit.
-    """
-    server.load_info()
-    antenna_simulated = server.hdwr("Antenna", "simulated")
-    # this appears to return 'None' instead of 'True' or 'False'
-    if antenna_simulated:
-        logger.debug("setup_server: switching antenna to workstation 0")
-        server.hdwr("Antenna", "connect_to_hardware", 0, "CDSCC")
-    return server
-
 
 def generate_socketio(hardware={}):
     """
@@ -92,6 +81,7 @@ def generate_socketio(hardware={}):
     """
     logger.debug("generate_socketio: hardware: %s", hardware)
     server = DSSServer('WBDC2_K2',
+                       parent=FlaskServer(),
                        logger=logging.getLogger(__name__+".DSSServer"),
                        config_args= {"hardware": hardware},
                        boresight_manager_file_paths=[],
@@ -104,11 +94,7 @@ def generate_socketio(hardware={}):
     app.config['SECRET_KEY'] = "radio_astronomy_is_cool"
     socketio = SocketIO(app, json=JSONWrapper(), cors_allowed_origins="*")
     logger.debug("generate_socketio: SocketIO initialized")
-    
-    # simulate the antenna connection if desired
-    server = setup_server(server)
-    logger.debug("generate_socketio: server set up")
-    
+
     # flaskify the server
     app, socketio, server = DSSServer.flaskify_io(
         server, app=app, socketio=socketio
